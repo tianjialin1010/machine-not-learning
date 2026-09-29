@@ -1,0 +1,1327 @@
+{
+  "ok": true,
+  "base": "http://127.0.0.1:19000",
+  "scenarios": {
+    "ai4i": {
+      "model": {
+        "name": "sentinel-mlp@cuda",
+        "version": "jev-decision-service 0.1.5",
+        "device": "cuda",
+        "sha256": "b9c7c81ae74d708273d7361faa7f5eb35a5d643612669877d14c5b95293e2070"
+      },
+      "feature_count": 5,
+      "tested_expected_classes": [
+        "RNF",
+        "No Failure",
+        "OSF",
+        "TWF",
+        "PWF",
+        "HDF"
+      ],
+      "classes_without_available_samples": [],
+      "runs": [
+        {
+          "sample_id": "ai4i-test-0",
+          "expected_class": "RNF",
+          "prediction": {
+            "label": "No Failure",
+            "probabilities": {
+              "No Failure": 0.99994,
+              "TWF": 1e-05,
+              "HDF": 1e-06,
+              "PWF": 4e-05,
+              "OSF": 6e-06,
+              "RNF": 3e-06
+            },
+            "is_anomaly": false,
+            "fault_probability": 5.1e-05,
+            "anomaly_rule": "fault_head_probability_gte_0.5",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "trace_4214e3f865c34884bf114dd6c9dc7a60",
+          "latency_ms": 1.0106740519404411
+        },
+        {
+          "sample_id": "ai4i-test-1",
+          "expected_class": "No Failure",
+          "prediction": {
+            "label": "No Failure",
+            "probabilities": {
+              "No Failure": 0.999592,
+              "TWF": 4.8e-05,
+              "HDF": 2.2e-05,
+              "PWF": 0.00021,
+              "OSF": 8.6e-05,
+              "RNF": 4.3e-05
+            },
+            "is_anomaly": false,
+            "fault_probability": 0.000365,
+            "anomaly_rule": "fault_head_probability_gte_0.5",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "trace_041e3e56657d4e79b389ab6d4a736bac",
+          "latency_ms": 2.086709253489971
+        },
+        {
+          "sample_id": "ai4i-test-10",
+          "expected_class": "OSF",
+          "prediction": {
+            "label": "No Failure",
+            "probabilities": {
+              "No Failure": 0.4906,
+              "TWF": 0.214872,
+              "HDF": 0.007637,
+              "PWF": 0.110724,
+              "OSF": 0.152439,
+              "RNF": 0.023728
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.530726,
+            "anomaly_rule": "fault_head_probability_gte_0.5",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "trace_b5072dbee1404b4794cbf11dd06924e5",
+          "latency_ms": 0.676352996379137
+        },
+        {
+          "sample_id": "ai4i-test-29",
+          "expected_class": "TWF",
+          "prediction": {
+            "label": "No Failure",
+            "probabilities": {
+              "No Failure": 0.949472,
+              "TWF": 0.02889,
+              "HDF": 0.000212,
+              "PWF": 0.007837,
+              "OSF": 0.012579,
+              "RNF": 0.001009
+            },
+            "is_anomaly": false,
+            "fault_probability": 0.050368,
+            "anomaly_rule": "fault_head_probability_gte_0.5",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "trace_a14c5b8488244bcf9d0d8f92c998919e",
+          "latency_ms": 0.6512016989290714
+        },
+        {
+          "sample_id": "ai4i-test-32",
+          "expected_class": "PWF",
+          "prediction": {
+            "label": "No Failure",
+            "probabilities": {
+              "No Failure": 0.754421,
+              "TWF": 0.029088,
+              "HDF": 0.113776,
+              "PWF": 0.032461,
+              "OSF": 0.051583,
+              "RNF": 0.018671
+            },
+            "is_anomaly": false,
+            "fault_probability": 0.257858,
+            "anomaly_rule": "fault_head_probability_gte_0.5",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "trace_8c47f8b5da3a4d209e73f9ebcfb35b31",
+          "latency_ms": 0.6073457188904285
+        },
+        {
+          "sample_id": "ai4i-test-194",
+          "expected_class": "HDF",
+          "prediction": {
+            "label": "No Failure",
+            "probabilities": {
+              "No Failure": 0.591496,
+              "TWF": 0.002329,
+              "HDF": 0.391158,
+              "PWF": 0.008037,
+              "OSF": 0.003387,
+              "RNF": 0.003593
+            },
+            "is_anomaly": false,
+            "fault_probability": 0.410335,
+            "anomaly_rule": "fault_head_probability_gte_0.5",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "trace_e74ddbf9589e4ab1898e0aea4a089d47",
+          "latency_ms": 0.7180501706898212
+        }
+      ],
+      "repeat_is_deterministic": true
+    },
+    "skab": {
+      "model": {
+        "name": "industrial-mlp",
+        "version": "skab-mlp64x32-20260929T035632Z",
+        "device": "cuda:0",
+        "sha256": "a6f21479fac91d27052ca2750c8fdbf327508a069c41bf2d99b08c915a508a05"
+      },
+      "feature_count": 8,
+      "tested_expected_classes": [
+        "normal",
+        "fault"
+      ],
+      "classes_without_available_samples": [],
+      "runs": [
+        {
+          "sample_id": "skab:other/1.csv:2",
+          "expected_class": "normal",
+          "prediction": {
+            "label": "fault",
+            "probabilities": {
+              "normal": 0.059330958873033524,
+              "fault": 0.940669059753418
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.9406690411269665,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "26720d42-e140-43df-9aba-cf57c4e09c39",
+          "latency_ms": 0.3075208514928818
+        },
+        {
+          "sample_id": "skab:other/1.csv:559",
+          "expected_class": "fault",
+          "prediction": {
+            "label": "normal",
+            "probabilities": {
+              "normal": 0.574931800365448,
+              "fault": 0.4250682294368744
+            },
+            "is_anomaly": false,
+            "fault_probability": 0.425068199634552,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "d354a032-64cc-40b9-9a3b-0170e05c6902",
+          "latency_ms": 0.25336025282740593
+        }
+      ],
+      "repeat_is_deterministic": true
+    },
+    "steel": {
+      "model": {
+        "name": "industrial-mlp",
+        "version": "steel-mlp64x32-20260929T035632Z",
+        "device": "cuda:0",
+        "sha256": "60464a4a7f2295977d69bcbfc1039a8e77749b64ca567d4bd47fad25eca77ba8"
+      },
+      "feature_count": 27,
+      "tested_expected_classes": [
+        "Pastry",
+        "Z_Scratch",
+        "K_Scatch",
+        "Stains",
+        "Dirtiness",
+        "Bumps",
+        "Other_Faults"
+      ],
+      "classes_without_available_samples": [],
+      "runs": [
+        {
+          "sample_id": "steel:Faults.NNA:118",
+          "expected_class": "Pastry",
+          "prediction": {
+            "label": "Pastry",
+            "probabilities": {
+              "Pastry": 0.9425939321517944,
+              "Z_Scratch": 0.00024161324836313725,
+              "K_Scatch": 0.003963745664805174,
+              "Stains": 1.1842042113130447e-05,
+              "Dirtiness": 0.011032983660697937,
+              "Bumps": 0.008494528941810131,
+              "Other_Faults": 0.033661358058452606
+            },
+            "is_anomaly": null,
+            "fault_probability": null,
+            "anomaly_rule": null,
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "7976bd75-e231-467d-b293-6ef63243732a",
+          "latency_ms": 0.29283296316862106
+        },
+        {
+          "sample_id": "steel:Faults.NNA:178",
+          "expected_class": "Z_Scratch",
+          "prediction": {
+            "label": "Z_Scratch",
+            "probabilities": {
+              "Pastry": 0.02362241968512535,
+              "Z_Scratch": 0.9205045700073242,
+              "K_Scatch": 0.00023324202629737556,
+              "Stains": 0.0015853970544412732,
+              "Dirtiness": 3.0397775844903663e-05,
+              "Bumps": 0.02268085442483425,
+              "Other_Faults": 0.03134308382868767
+            },
+            "is_anomaly": null,
+            "fault_probability": null,
+            "anomaly_rule": null,
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "d1fc9df0-e8f1-46dd-bba4-9f461d1795e4",
+          "latency_ms": 0.17699319869279861
+        },
+        {
+          "sample_id": "steel:Faults.NNA:411",
+          "expected_class": "K_Scatch",
+          "prediction": {
+            "label": "K_Scatch",
+            "probabilities": {
+              "Pastry": 2.9912607715232298e-06,
+              "Z_Scratch": 4.46867234131787e-05,
+              "K_Scatch": 0.9979161620140076,
+              "Stains": 2.1602265576348145e-07,
+              "Dirtiness": 1.7649777873884887e-05,
+              "Bumps": 8.520931442035362e-05,
+              "Other_Faults": 0.0019330262439325452
+            },
+            "is_anomaly": null,
+            "fault_probability": null,
+            "anomaly_rule": null,
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "3db0ef1a-fce9-4f52-a5ff-b3a0a5c547cd",
+          "latency_ms": 0.16958359628915787
+        },
+        {
+          "sample_id": "steel:Faults.NNA:772",
+          "expected_class": "Stains",
+          "prediction": {
+            "label": "Stains",
+            "probabilities": {
+              "Pastry": 0.00012177576718386263,
+              "Z_Scratch": 0.00024842750281095505,
+              "K_Scatch": 0.0008668967639096081,
+              "Stains": 0.9955346584320068,
+              "Dirtiness": 0.00013989930448587984,
+              "Bumps": 0.0015335310017690063,
+              "Other_Faults": 0.0015548554947599769
+            },
+            "is_anomaly": null,
+            "fault_probability": null,
+            "anomaly_rule": null,
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "67474017-fe1e-422b-9359-60705adb8356",
+          "latency_ms": 0.16540801152586937
+        },
+        {
+          "sample_id": "steel:Faults.NNA:841",
+          "expected_class": "Dirtiness",
+          "prediction": {
+            "label": "Dirtiness",
+            "probabilities": {
+              "Pastry": 0.01438300870358944,
+              "Z_Scratch": 0.0014094406506046653,
+              "K_Scatch": 7.445204391842708e-05,
+              "Stains": 4.015000376966782e-05,
+              "Dirtiness": 0.978161096572876,
+              "Bumps": 0.0018956902204081416,
+              "Other_Faults": 0.00403613643720746
+            },
+            "is_anomaly": null,
+            "fault_probability": null,
+            "anomaly_rule": null,
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "f3ba7b61-4c85-46cd-9999-60c8bd1f3864",
+          "latency_ms": 0.15110382810235023
+        },
+        {
+          "sample_id": "steel:Faults.NNA:1148",
+          "expected_class": "Bumps",
+          "prediction": {
+            "label": "Bumps",
+            "probabilities": {
+              "Pastry": 0.013407989405095577,
+              "Z_Scratch": 0.0005253914860077202,
+              "K_Scatch": 0.0020280242897570133,
+              "Stains": 0.00012820771371480078,
+              "Dirtiness": 2.7581613721849862e-06,
+              "Bumps": 0.8693943619728088,
+              "Other_Faults": 0.1145133376121521
+            },
+            "is_anomaly": null,
+            "fault_probability": null,
+            "anomaly_rule": null,
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "1ea42c29-9cfa-46bf-bcfc-d20c6536fc21",
+          "latency_ms": 0.15315180644392967
+        },
+        {
+          "sample_id": "steel:Faults.NNA:1616",
+          "expected_class": "Other_Faults",
+          "prediction": {
+            "label": "Z_Scratch",
+            "probabilities": {
+              "Pastry": 0.007040177006274462,
+              "Z_Scratch": 0.6892955303192139,
+              "K_Scatch": 0.0010025971569120884,
+              "Stains": 0.015747997909784317,
+              "Dirtiness": 0.00020924863929394633,
+              "Bumps": 0.11509526520967484,
+              "Other_Faults": 0.17160917818546295
+            },
+            "is_anomaly": null,
+            "fault_probability": null,
+            "anomaly_rule": null,
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "f2b85046-122e-4eda-aea3-093a6cde81d4",
+          "latency_ms": 0.14518387615680695
+        }
+      ],
+      "repeat_is_deterministic": true
+    },
+    "secom": {
+      "model": {
+        "name": "industrial-mlp",
+        "version": "secom-mlp64x32-20260929T040032Z",
+        "device": "cuda:0",
+        "sha256": "4a26315a01300f6803a89b3f7ba9bd8408a198d919ae180b9d7862359ca577dd"
+      },
+      "feature_count": 590,
+      "tested_expected_classes": [
+        "normal",
+        "fault"
+      ],
+      "classes_without_available_samples": [],
+      "runs": [
+        {
+          "sample_id": "secom:secom.data:1254",
+          "expected_class": "normal",
+          "prediction": {
+            "label": "normal",
+            "probabilities": {
+              "normal": 0.8708292245864868,
+              "fault": 0.12917080521583557
+            },
+            "is_anomaly": false,
+            "fault_probability": 0.12917077541351318,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "ecb56357-8006-49cb-8718-664f4d6c2482",
+          "latency_ms": 13.067218009382486
+        },
+        {
+          "sample_id": "secom:secom.data:1255",
+          "expected_class": "fault",
+          "prediction": {
+            "label": "normal",
+            "probabilities": {
+              "normal": 0.9891113638877869,
+              "fault": 0.010888611897826195
+            },
+            "is_anomaly": false,
+            "fault_probability": 0.010888636112213135,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "b92b7425-a720-428f-99f6-606a47f9b192",
+          "latency_ms": 0.3655371256172657
+        }
+      ],
+      "repeat_is_deterministic": true
+    },
+    "tep": {
+      "model": {
+        "name": "industrial-mlp",
+        "version": "tep-mlp64x32-20260929T040032Z",
+        "device": "cuda:0",
+        "sha256": "b6b0cbcf995d260613159f3b0292392769b9c934085010d924da84fdc8f2a58a"
+      },
+      "feature_count": 52,
+      "tested_expected_classes": [
+        "Normal",
+        "Fault1",
+        "Fault2",
+        "Fault3",
+        "Fault4",
+        "Fault5",
+        "Fault6",
+        "Fault7",
+        "Fault8",
+        "Fault9",
+        "Fault10",
+        "Fault11",
+        "Fault12",
+        "Fault13",
+        "Fault14",
+        "Fault15",
+        "Fault16",
+        "Fault17",
+        "Fault18",
+        "Fault19",
+        "Fault20",
+        "Fault21"
+      ],
+      "classes_without_available_samples": [],
+      "runs": [
+        {
+          "sample_id": "tep:d00_te.dat:1",
+          "expected_class": "Normal",
+          "prediction": {
+            "label": "Normal",
+            "probabilities": {
+              "Normal": 0.14697802066802979,
+              "Fault1": 0.00046826567267999053,
+              "Fault2": 0.004050135146826506,
+              "Fault3": 0.08978625386953354,
+              "Fault4": 0.021751167252659798,
+              "Fault5": 0.0017677355790510774,
+              "Fault6": 0.0005178280407562852,
+              "Fault7": 0.001056650304235518,
+              "Fault8": 0.008225485682487488,
+              "Fault9": 0.11855471879243851,
+              "Fault10": 0.04174155369400978,
+              "Fault11": 0.06753003597259521,
+              "Fault12": 0.005270255729556084,
+              "Fault13": 0.0019079522462561727,
+              "Fault14": 0.010808444581925869,
+              "Fault15": 0.08758950978517532,
+              "Fault16": 0.13414344191551208,
+              "Fault17": 0.010535514913499355,
+              "Fault18": 0.010976945981383324,
+              "Fault19": 0.11188914626836777,
+              "Fault20": 0.056202199310064316,
+              "Fault21": 0.06824877858161926
+            },
+            "is_anomaly": false,
+            "fault_probability": 0.8530219793319702,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "f97dc489-30a6-4b37-b4c7-5ebb720ba2e7",
+          "latency_ms": 0.2521923743188381
+        },
+        {
+          "sample_id": "tep:d01_te.dat:161",
+          "expected_class": "Fault1",
+          "prediction": {
+            "label": "Fault15",
+            "probabilities": {
+              "Normal": 0.129789337515831,
+              "Fault1": 0.0008145316387526691,
+              "Fault2": 0.002252394799143076,
+              "Fault3": 0.07336553931236267,
+              "Fault4": 0.0422397218644619,
+              "Fault5": 0.004932477604597807,
+              "Fault6": 0.0008594119572080672,
+              "Fault7": 0.0002490901679266244,
+              "Fault8": 0.0030824304558336735,
+              "Fault9": 0.08480248600244522,
+              "Fault10": 0.06833729892969131,
+              "Fault11": 0.061214569956064224,
+              "Fault12": 0.01194627583026886,
+              "Fault13": 0.00319826346822083,
+              "Fault14": 0.008688758127391338,
+              "Fault15": 0.16445708274841309,
+              "Fault16": 0.1249479427933693,
+              "Fault17": 0.007040941622108221,
+              "Fault18": 0.0068205553106963634,
+              "Fault19": 0.02618623897433281,
+              "Fault20": 0.03595958650112152,
+              "Fault21": 0.1388150304555893
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.870210662484169,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "5d8e4e7d-998c-4f84-8665-6ab0899a709e",
+          "latency_ms": 0.17416104674339294
+        },
+        {
+          "sample_id": "tep:d02_te.dat:161",
+          "expected_class": "Fault2",
+          "prediction": {
+            "label": "Fault21",
+            "probabilities": {
+              "Normal": 0.10433217138051987,
+              "Fault1": 0.0005302676581777632,
+              "Fault2": 0.0007150282617658377,
+              "Fault3": 0.056396689265966415,
+              "Fault4": 0.020314646884799004,
+              "Fault5": 0.0013802614994347095,
+              "Fault6": 0.00023670264636166394,
+              "Fault7": 0.00016892459825612605,
+              "Fault8": 0.005026634782552719,
+              "Fault9": 0.09976128488779068,
+              "Fault10": 0.056453775614500046,
+              "Fault11": 0.08973342925310135,
+              "Fault12": 0.007804347202181816,
+              "Fault13": 0.004556375555694103,
+              "Fault14": 0.017728611826896667,
+              "Fault15": 0.16089549660682678,
+              "Fault16": 0.05693024769425392,
+              "Fault17": 0.003436534432694316,
+              "Fault18": 0.007620957214385271,
+              "Fault19": 0.033567145466804504,
+              "Fault20": 0.01606384851038456,
+              "Fault21": 0.25634661316871643
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.8956678286194801,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "391fd6bf-4385-47d3-9504-50a1e3a1e7fe",
+          "latency_ms": 0.1596328802406788
+        },
+        {
+          "sample_id": "tep:d03_te.dat:161",
+          "expected_class": "Fault3",
+          "prediction": {
+            "label": "Fault19",
+            "probabilities": {
+              "Normal": 0.0894629955291748,
+              "Fault1": 0.0003205400425940752,
+              "Fault2": 0.01681716926395893,
+              "Fault3": 0.10744092613458633,
+              "Fault4": 0.0407196506857872,
+              "Fault5": 0.003202244406566024,
+              "Fault6": 0.0012448691995814443,
+              "Fault7": 0.0007748866337351501,
+              "Fault8": 0.00914207473397255,
+              "Fault9": 0.07622037082910538,
+              "Fault10": 0.06325063854455948,
+              "Fault11": 0.07160899043083191,
+              "Fault12": 0.005502536427229643,
+              "Fault13": 0.005114749073982239,
+              "Fault14": 0.030584102496504784,
+              "Fault15": 0.03412545844912529,
+              "Fault16": 0.12447817623615265,
+              "Fault17": 0.052990444004535675,
+              "Fault18": 0.04355012997984886,
+              "Fault19": 0.1438477337360382,
+              "Fault20": 0.007144344970583916,
+              "Fault21": 0.07245698571205139
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.9105370044708252,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "d22d8056-ef25-4b91-828b-7dc5e77ca81c",
+          "latency_ms": 0.1463852822780609
+        },
+        {
+          "sample_id": "tep:d04_te.dat:161",
+          "expected_class": "Fault4",
+          "prediction": {
+            "label": "Fault14",
+            "probabilities": {
+              "Normal": 3.100169124081731e-05,
+              "Fault1": 8.009551493159961e-06,
+              "Fault2": 1.4594193089578766e-05,
+              "Fault3": 8.272819104604423e-05,
+              "Fault4": 0.00026182521833106875,
+              "Fault5": 8.148499910021201e-05,
+              "Fault6": 4.756720954901539e-06,
+              "Fault7": 7.700712558289524e-06,
+              "Fault8": 0.00016551863518543541,
+              "Fault9": 4.1374689317308366e-05,
+              "Fault10": 1.0653894605638925e-05,
+              "Fault11": 0.1916295289993286,
+              "Fault12": 3.287909748905804e-06,
+              "Fault13": 0.0009637498296797276,
+              "Fault14": 0.8051279783248901,
+              "Fault15": 5.15815190738067e-05,
+              "Fault16": 3.879865289491136e-06,
+              "Fault17": 1.7396576367900707e-05,
+              "Fault18": 0.0006724077393300831,
+              "Fault19": 0.0005252587143331766,
+              "Fault20": 6.654114258708432e-05,
+              "Fault21": 0.00022873200941830873
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.9999689983087592,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "6f341d0a-c058-4d88-9ebe-f69a892bc538",
+          "latency_ms": 0.14236895367503166
+        },
+        {
+          "sample_id": "tep:d05_te.dat:161",
+          "expected_class": "Fault5",
+          "prediction": {
+            "label": "Fault14",
+            "probabilities": {
+              "Normal": 0.052012257277965546,
+              "Fault1": 0.005904742516577244,
+              "Fault2": 0.0011735660955309868,
+              "Fault3": 0.08629729598760605,
+              "Fault4": 0.01346332672983408,
+              "Fault5": 0.008440096862614155,
+              "Fault6": 0.0003684036200866103,
+              "Fault7": 0.0024974585976451635,
+              "Fault8": 0.01795913651585579,
+              "Fault9": 0.047382138669490814,
+              "Fault10": 0.05607616528868675,
+              "Fault11": 0.1876349002122879,
+              "Fault12": 0.005315680522471666,
+              "Fault13": 0.00521639920771122,
+              "Fault14": 0.23464004695415497,
+              "Fault15": 0.08687009662389755,
+              "Fault16": 0.027692465111613274,
+              "Fault17": 0.00199781428091228,
+              "Fault18": 0.0038359735626727343,
+              "Fault19": 0.05714290216565132,
+              "Fault20": 0.013881715014576912,
+              "Fault21": 0.08419740200042725
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.9479877427220345,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "6435b87f-d45e-489c-b143-e9507992c6e3",
+          "latency_ms": 0.1409449614584446
+        },
+        {
+          "sample_id": "tep:d06_te.dat:161",
+          "expected_class": "Fault6",
+          "prediction": {
+            "label": "Fault17",
+            "probabilities": {
+              "Normal": 0.013786345720291138,
+              "Fault1": 0.0014596255496144295,
+              "Fault2": 0.004864657763391733,
+              "Fault3": 0.09200628101825714,
+              "Fault4": 0.0699719488620758,
+              "Fault5": 0.05817430838942528,
+              "Fault6": 0.028509382158517838,
+              "Fault7": 0.001292416243813932,
+              "Fault8": 0.03613903000950813,
+              "Fault9": 0.04309305176138878,
+              "Fault10": 0.08546184003353119,
+              "Fault11": 0.03444261848926544,
+              "Fault12": 0.051090314984321594,
+              "Fault13": 0.029582206159830093,
+              "Fault14": 0.01246218103915453,
+              "Fault15": 0.0780831128358841,
+              "Fault16": 0.04683384299278259,
+              "Fault17": 0.150626078248024,
+              "Fault18": 0.04984873905777931,
+              "Fault19": 0.0041007837280631065,
+              "Fault20": 0.08606907725334167,
+              "Fault21": 0.022102149203419685
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.9862136542797089,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "d4441e09-10c9-47ac-b25a-eb494322fb19",
+          "latency_ms": 0.11579319834709167
+        },
+        {
+          "sample_id": "tep:d07_te.dat:161",
+          "expected_class": "Fault7",
+          "prediction": {
+            "label": "Fault7",
+            "probabilities": {
+              "Normal": 0.001979508437216282,
+              "Fault1": 0.012198631651699543,
+              "Fault2": 0.010477332398295403,
+              "Fault3": 0.012085902504622936,
+              "Fault4": 1.3612618204206228e-05,
+              "Fault5": 0.015350738540291786,
+              "Fault6": 0.0007213093340396881,
+              "Fault7": 0.5892066955566406,
+              "Fault8": 0.09369627386331558,
+              "Fault9": 0.0018182399217039347,
+              "Fault10": 0.06657791137695312,
+              "Fault11": 0.0038099405355751514,
+              "Fault12": 0.0690474659204483,
+              "Fault13": 0.006867671851068735,
+              "Fault14": 0.05089868605136871,
+              "Fault15": 0.0026515654753893614,
+              "Fault16": 0.007425786927342415,
+              "Fault17": 0.0023766765370965004,
+              "Fault18": 0.04176710546016693,
+              "Fault19": 0.009033972397446632,
+              "Fault20": 0.00015035692194942385,
+              "Fault21": 0.0018445653840899467
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.9980204915627837,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "5a25e17c-0730-46cb-a589-d8c512b980a2",
+          "latency_ms": 0.11416012421250343
+        },
+        {
+          "sample_id": "tep:d08_te.dat:161",
+          "expected_class": "Fault8",
+          "prediction": {
+            "label": "Normal",
+            "probabilities": {
+              "Normal": 0.1450500637292862,
+              "Fault1": 0.00025406022905372083,
+              "Fault2": 0.003145829774439335,
+              "Fault3": 0.13840974867343903,
+              "Fault4": 0.049036260694265366,
+              "Fault5": 0.009432564489543438,
+              "Fault6": 0.00035785604268312454,
+              "Fault7": 0.0002073692885460332,
+              "Fault8": 0.011119040660560131,
+              "Fault9": 0.06125916913151741,
+              "Fault10": 0.06202015280723572,
+              "Fault11": 0.09491010755300522,
+              "Fault12": 0.009197289124131203,
+              "Fault13": 0.0013173874467611313,
+              "Fault14": 0.010982086881995201,
+              "Fault15": 0.09802026301622391,
+              "Fault16": 0.11264224350452423,
+              "Fault17": 0.012928723357617855,
+              "Fault18": 0.0194321870803833,
+              "Fault19": 0.01824204809963703,
+              "Fault20": 0.011118998751044273,
+              "Fault21": 0.1309165209531784
+            },
+            "is_anomaly": false,
+            "fault_probability": 0.8549499362707138,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "35b56ba3-fbb0-4f43-9a67-08f4dfe0fab4",
+          "latency_ms": 0.11524790897965431
+        },
+        {
+          "sample_id": "tep:d09_te.dat:161",
+          "expected_class": "Fault9",
+          "prediction": {
+            "label": "Fault20",
+            "probabilities": {
+              "Normal": 0.0717541053891182,
+              "Fault1": 5.102972500026226e-05,
+              "Fault2": 0.001126291579566896,
+              "Fault3": 0.12127436697483063,
+              "Fault4": 0.008748888969421387,
+              "Fault5": 0.000547887641005218,
+              "Fault6": 0.00021803694835398346,
+              "Fault7": 0.0006340261898003519,
+              "Fault8": 0.02589842677116394,
+              "Fault9": 0.12714017927646637,
+              "Fault10": 0.01763678900897503,
+              "Fault11": 0.09756085276603699,
+              "Fault12": 0.0021002802532166243,
+              "Fault13": 0.0012065431801602244,
+              "Fault14": 0.012933626770973206,
+              "Fault15": 0.08385397493839264,
+              "Fault16": 0.12130291014909744,
+              "Fault17": 0.005450769793242216,
+              "Fault18": 0.0278138667345047,
+              "Fault19": 0.09712883830070496,
+              "Fault20": 0.1589556187391281,
+              "Fault21": 0.016662627458572388
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.9282458946108818,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "4e7fe05c-8b89-4914-bd5f-95993ef8b70f",
+          "latency_ms": 0.11535966768860817
+        },
+        {
+          "sample_id": "tep:d10_te.dat:161",
+          "expected_class": "Fault10",
+          "prediction": {
+            "label": "Fault9",
+            "probabilities": {
+              "Normal": 0.09659916907548904,
+              "Fault1": 0.0003707775322254747,
+              "Fault2": 0.0009626789251342416,
+              "Fault3": 0.08847626298666,
+              "Fault4": 0.010970795527100563,
+              "Fault5": 0.0015905729960650206,
+              "Fault6": 0.0001836819719756022,
+              "Fault7": 0.0006792296771891415,
+              "Fault8": 0.014856019988656044,
+              "Fault9": 0.15888036787509918,
+              "Fault10": 0.07528768479824066,
+              "Fault11": 0.06442765891551971,
+              "Fault12": 0.008655660785734653,
+              "Fault13": 0.0015494938706979156,
+              "Fault14": 0.009315459057688713,
+              "Fault15": 0.14555443823337555,
+              "Fault16": 0.1236918494105339,
+              "Fault17": 0.001713370904326439,
+              "Fault18": 0.009254039265215397,
+              "Fault19": 0.04708914831280708,
+              "Fault20": 0.06580966711044312,
+              "Fault21": 0.0740818977355957
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.903400830924511,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "ba2abac8-b393-492c-8181-fd81a1cf3863",
+          "latency_ms": 0.11371215805411339
+        },
+        {
+          "sample_id": "tep:d11_te.dat:161",
+          "expected_class": "Fault11",
+          "prediction": {
+            "label": "Fault10",
+            "probabilities": {
+              "Normal": 0.03688708320260048,
+              "Fault1": 0.004102813079953194,
+              "Fault2": 0.006197901908308268,
+              "Fault3": 0.06490189582109451,
+              "Fault4": 0.009937346912920475,
+              "Fault5": 0.01579958200454712,
+              "Fault6": 0.005172870121896267,
+              "Fault7": 0.002852735109627247,
+              "Fault8": 0.02645016275346279,
+              "Fault9": 0.1001957580447197,
+              "Fault10": 0.18096816539764404,
+              "Fault11": 0.06543141603469849,
+              "Fault12": 0.06857874244451523,
+              "Fault13": 0.02388749085366726,
+              "Fault14": 0.02405921369791031,
+              "Fault15": 0.08967810869216919,
+              "Fault16": 0.0784648060798645,
+              "Fault17": 0.02179224044084549,
+              "Fault18": 0.022547855973243713,
+              "Fault19": 0.028011655434966087,
+              "Fault20": 0.03535977751016617,
+              "Fault21": 0.0887223482131958
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.9631129167973995,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "fd8ca1bc-45b8-4301-971e-98cec55bd6f0",
+          "latency_ms": 0.11275289580225945
+        },
+        {
+          "sample_id": "tep:d12_te.dat:161",
+          "expected_class": "Fault12",
+          "prediction": {
+            "label": "Fault20",
+            "probabilities": {
+              "Normal": 0.022140411660075188,
+              "Fault1": 0.002903501270338893,
+              "Fault2": 0.0010729224886745214,
+              "Fault3": 0.053756289184093475,
+              "Fault4": 0.007041530217975378,
+              "Fault5": 0.004135260358452797,
+              "Fault6": 0.0014999463455751538,
+              "Fault7": 0.001482450170442462,
+              "Fault8": 0.007526503410190344,
+              "Fault9": 0.10625758767127991,
+              "Fault10": 0.12382414937019348,
+              "Fault11": 0.030055854469537735,
+              "Fault12": 0.011734544299542904,
+              "Fault13": 0.011046059429645538,
+              "Fault14": 0.011145315133035183,
+              "Fault15": 0.13090814650058746,
+              "Fault16": 0.05442405864596367,
+              "Fault17": 0.0058732046745717525,
+              "Fault18": 0.007973507978022099,
+              "Fault19": 0.03286324068903923,
+              "Fault20": 0.35574784874916077,
+              "Fault21": 0.016587698832154274
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.9778595883399248,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "b3bb2009-eb85-4b28-9f4e-de74b948c90b",
+          "latency_ms": 0.11353613808751106
+        },
+        {
+          "sample_id": "tep:d13_te.dat:161",
+          "expected_class": "Fault13",
+          "prediction": {
+            "label": "Normal",
+            "probabilities": {
+              "Normal": 0.17758120596408844,
+              "Fault1": 0.0001787935761967674,
+              "Fault2": 0.0036522706504911184,
+              "Fault3": 0.06727933883666992,
+              "Fault4": 0.03666594251990318,
+              "Fault5": 0.0028049261309206486,
+              "Fault6": 0.00018312170868739486,
+              "Fault7": 0.00019349262584000826,
+              "Fault8": 0.010400945320725441,
+              "Fault9": 0.1258227378129959,
+              "Fault10": 0.04045043885707855,
+              "Fault11": 0.08681018650531769,
+              "Fault12": 0.005593782756477594,
+              "Fault13": 0.0010505786631256342,
+              "Fault14": 0.010244264267385006,
+              "Fault15": 0.09282103180885315,
+              "Fault16": 0.12889398634433746,
+              "Fault17": 0.005000635050237179,
+              "Fault18": 0.01416289247572422,
+              "Fault19": 0.080665223300457,
+              "Fault20": 0.023476481437683105,
+              "Fault21": 0.08606775104999542
+            },
+            "is_anomaly": false,
+            "fault_probability": 0.8224187940359116,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "2e608ff1-7ffc-4264-bc13-941e58d12231",
+          "latency_ms": 0.11576013639569283
+        },
+        {
+          "sample_id": "tep:d14_te.dat:161",
+          "expected_class": "Fault14",
+          "prediction": {
+            "label": "Fault11",
+            "probabilities": {
+              "Normal": 0.028292126953601837,
+              "Fault1": 0.00012286768469493836,
+              "Fault2": 0.0014622487360611558,
+              "Fault3": 0.033426664769649506,
+              "Fault4": 0.08905097097158432,
+              "Fault5": 0.002450676867738366,
+              "Fault6": 0.0002500755072105676,
+              "Fault7": 0.000132635555928573,
+              "Fault8": 0.006323233712464571,
+              "Fault9": 0.019686425104737282,
+              "Fault10": 0.005494973156601191,
+              "Fault11": 0.45497575402259827,
+              "Fault12": 0.0007940371870063245,
+              "Fault13": 0.0038766723591834307,
+              "Fault14": 0.19479824602603912,
+              "Fault15": 0.019973846152424812,
+              "Fault16": 0.0070727732963860035,
+              "Fault17": 0.007383998949080706,
+              "Fault18": 0.01615363359451294,
+              "Fault19": 0.034008175134658813,
+              "Fault20": 0.008405669592320919,
+              "Fault21": 0.06586433202028275
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.9717078730463982,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "7332aa5c-1dda-4181-b80d-ebd13a57619c",
+          "latency_ms": 0.11716829612851143
+        },
+        {
+          "sample_id": "tep:d15_te.dat:161",
+          "expected_class": "Fault15",
+          "prediction": {
+            "label": "Fault10",
+            "probabilities": {
+              "Normal": 0.044890642166137695,
+              "Fault1": 0.0034997519105672836,
+              "Fault2": 0.00415597902610898,
+              "Fault3": 0.04003153741359711,
+              "Fault4": 0.002205302705988288,
+              "Fault5": 0.005805557128041983,
+              "Fault6": 0.00221237656660378,
+              "Fault7": 0.005183720029890537,
+              "Fault8": 0.020276349037885666,
+              "Fault9": 0.17355193197727203,
+              "Fault10": 0.18797104060649872,
+              "Fault11": 0.04961403086781502,
+              "Fault12": 0.03905075788497925,
+              "Fault13": 0.01366355549544096,
+              "Fault14": 0.02515890635550022,
+              "Fault15": 0.0982755497097969,
+              "Fault16": 0.1132654920220375,
+              "Fault17": 0.010423422791063786,
+              "Fault18": 0.019557194784283638,
+              "Fault19": 0.04162358492612839,
+              "Fault20": 0.07650845497846603,
+              "Fault21": 0.023074783384799957
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.9551093578338623,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "b25584ed-2704-4502-b399-c048b9b1bd1e",
+          "latency_ms": 0.11649588122963905
+        },
+        {
+          "sample_id": "tep:d16_te.dat:161",
+          "expected_class": "Fault16",
+          "prediction": {
+            "label": "Fault16",
+            "probabilities": {
+              "Normal": 0.05002933740615845,
+              "Fault1": 0.002048096153885126,
+              "Fault2": 0.003546880092471838,
+              "Fault3": 0.08419820666313171,
+              "Fault4": 0.0008102305000647902,
+              "Fault5": 0.017344903200864792,
+              "Fault6": 0.0005566786858253181,
+              "Fault7": 0.005959575064480305,
+              "Fault8": 0.1371159851551056,
+              "Fault9": 0.050312019884586334,
+              "Fault10": 0.18201656639575958,
+              "Fault11": 0.02176843024790287,
+              "Fault12": 0.0833161398768425,
+              "Fault13": 0.0008440754027105868,
+              "Fault14": 0.013333712704479694,
+              "Fault15": 0.0647435113787651,
+              "Fault16": 0.20997750759124756,
+              "Fault17": 0.0011249161325395107,
+              "Fault18": 0.03504570573568344,
+              "Fault19": 0.010247237049043179,
+              "Fault20": 0.01086424756795168,
+              "Fault21": 0.014796081930398941
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.9499706625938416,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "7e9b6810-56f4-4de2-8675-de0e2b3e047a",
+          "latency_ms": 0.11388864368200302
+        },
+        {
+          "sample_id": "tep:d17_te.dat:161",
+          "expected_class": "Fault17",
+          "prediction": {
+            "label": "Fault19",
+            "probabilities": {
+              "Normal": 0.1163550540804863,
+              "Fault1": 0.0019140109652653337,
+              "Fault2": 0.002052397234365344,
+              "Fault3": 0.05453898385167122,
+              "Fault4": 0.025345243513584137,
+              "Fault5": 0.0012312403414398432,
+              "Fault6": 0.0018395473016425967,
+              "Fault7": 0.0006636889302171767,
+              "Fault8": 0.04657799378037453,
+              "Fault9": 0.15276585519313812,
+              "Fault10": 0.03861532360315323,
+              "Fault11": 0.049093689769506454,
+              "Fault12": 0.0033317969646304846,
+              "Fault13": 0.00707660848274827,
+              "Fault14": 0.02265787497162819,
+              "Fault15": 0.0982404425740242,
+              "Fault16": 0.10623465478420258,
+              "Fault17": 0.007348081097006798,
+              "Fault18": 0.009396741166710854,
+              "Fault19": 0.15504376590251923,
+              "Fault20": 0.02997405454516411,
+              "Fault21": 0.06970296055078506
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.8836449459195137,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "a211fe1f-c3db-4831-ba83-90abff096916",
+          "latency_ms": 0.1142239198088646
+        },
+        {
+          "sample_id": "tep:d18_te.dat:161",
+          "expected_class": "Fault18",
+          "prediction": {
+            "label": "Normal",
+            "probabilities": {
+              "Normal": 0.1528470665216446,
+              "Fault1": 0.0012617805041372776,
+              "Fault2": 0.009794489480555058,
+              "Fault3": 0.12334847450256348,
+              "Fault4": 0.030857961624860764,
+              "Fault5": 0.007227637805044651,
+              "Fault6": 0.0009367549791932106,
+              "Fault7": 0.0014331415295600891,
+              "Fault8": 0.01695089600980282,
+              "Fault9": 0.09072890877723694,
+              "Fault10": 0.04574466496706009,
+              "Fault11": 0.08556777983903885,
+              "Fault12": 0.008287177421152592,
+              "Fault13": 0.0014620397705584764,
+              "Fault14": 0.032611191272735596,
+              "Fault15": 0.05402547866106033,
+              "Fault16": 0.1517842411994934,
+              "Fault17": 0.03262562304735184,
+              "Fault18": 0.009928461164236069,
+              "Fault19": 0.06613802909851074,
+              "Fault20": 0.008129182271659374,
+              "Fault21": 0.0683090016245842
+            },
+            "is_anomaly": false,
+            "fault_probability": 0.8471529334783554,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "ff479238-e91f-4587-9864-2318d5187200",
+          "latency_ms": 0.13091228902339935
+        },
+        {
+          "sample_id": "tep:d19_te.dat:161",
+          "expected_class": "Fault19",
+          "prediction": {
+            "label": "Normal",
+            "probabilities": {
+              "Normal": 0.13134698569774628,
+              "Fault1": 0.0011154381791129708,
+              "Fault2": 0.003735555335879326,
+              "Fault3": 0.08244062215089798,
+              "Fault4": 0.023675085976719856,
+              "Fault5": 0.0030608810484409332,
+              "Fault6": 0.0006476951530203223,
+              "Fault7": 0.0011730990372598171,
+              "Fault8": 0.009009171277284622,
+              "Fault9": 0.1295901983976364,
+              "Fault10": 0.07778792083263397,
+              "Fault11": 0.06410820782184601,
+              "Fault12": 0.007436790503561497,
+              "Fault13": 0.004181902855634689,
+              "Fault14": 0.013765392825007439,
+              "Fault15": 0.11363231390714645,
+              "Fault16": 0.10558745265007019,
+              "Fault17": 0.015081832185387611,
+              "Fault18": 0.006668761372566223,
+              "Fault19": 0.0925414189696312,
+              "Fault20": 0.02635185979306698,
+              "Fault21": 0.08706135302782059
+            },
+            "is_anomaly": false,
+            "fault_probability": 0.8686530143022537,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "75efd782-9ea8-4eb0-b261-45024722f782",
+          "latency_ms": 0.1284000463783741
+        },
+        {
+          "sample_id": "tep:d20_te.dat:161",
+          "expected_class": "Fault20",
+          "prediction": {
+            "label": "Normal",
+            "probabilities": {
+              "Normal": 0.16068805754184723,
+              "Fault1": 0.00023421850346494466,
+              "Fault2": 0.004219456575810909,
+              "Fault3": 0.12252655625343323,
+              "Fault4": 0.04207523167133331,
+              "Fault5": 0.002945111831650138,
+              "Fault6": 0.0005885627469979227,
+              "Fault7": 0.0003345657023601234,
+              "Fault8": 0.005862558260560036,
+              "Fault9": 0.08010324090719223,
+              "Fault10": 0.029495470225811005,
+              "Fault11": 0.07347352802753448,
+              "Fault12": 0.0044924234971404076,
+              "Fault13": 0.0013680815463885665,
+              "Fault14": 0.008262173272669315,
+              "Fault15": 0.09378083050251007,
+              "Fault16": 0.12924115359783173,
+              "Fault17": 0.03995035961270332,
+              "Fault18": 0.00875610951334238,
+              "Fault19": 0.055408794432878494,
+              "Fault20": 0.014137539081275463,
+              "Fault21": 0.12205596268177032
+            },
+            "is_anomaly": false,
+            "fault_probability": 0.8393119424581528,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "9410108e-097d-4906-9a7d-bd22831915f3",
+          "latency_ms": 0.1176958903670311
+        },
+        {
+          "sample_id": "tep:d21_te.dat:161",
+          "expected_class": "Fault21",
+          "prediction": {
+            "label": "Fault16",
+            "probabilities": {
+              "Normal": 0.08651286363601685,
+              "Fault1": 0.00027970282826572657,
+              "Fault2": 0.0009853895753622055,
+              "Fault3": 0.10310377180576324,
+              "Fault4": 0.015505436807870865,
+              "Fault5": 0.0003124071517959237,
+              "Fault6": 0.0005172829842194915,
+              "Fault7": 0.0005275380681268871,
+              "Fault8": 0.004402553662657738,
+              "Fault9": 0.16615456342697144,
+              "Fault10": 0.05277301371097565,
+              "Fault11": 0.03715083375573158,
+              "Fault12": 0.0044173868373036385,
+              "Fault13": 0.0012252895394340158,
+              "Fault14": 0.007180575281381607,
+              "Fault15": 0.12730206549167633,
+              "Fault16": 0.1731826364994049,
+              "Fault17": 0.005347586702555418,
+              "Fault18": 0.008703823201358318,
+              "Fault19": 0.04869266226887703,
+              "Fault20": 0.0972776934504509,
+              "Fault21": 0.058444902300834656
+            },
+            "is_anomaly": true,
+            "fault_probability": 0.9134871363639832,
+            "anomaly_rule": "predicted_class_is_not_normal",
+            "calibrated": true,
+            "calibration_method": "temperature_scaling"
+          },
+          "trace_id": "675f5fc9-4b14-4a84-ab94-c5f4c2a250f1",
+          "latency_ms": 0.12236880138516426
+        }
+      ],
+      "repeat_is_deterministic": true
+    }
+  },
+  "error_checks": {
+    "unknown_scenario": 422,
+    "unknown_sample": 404,
+    "cross_scenario_sample": 404,
+    "unexpected_features": 422
+  }
+}

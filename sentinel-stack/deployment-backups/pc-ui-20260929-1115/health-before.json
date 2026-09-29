@@ -1,0 +1,80 @@
+{
+  "ok": true,
+  "provider": "tiered",
+  "degraded": false,
+  "framework": "jev-decision-service 0.1.5",
+  "decision_head": "sentinel-mlp@cuda",
+  "torch": "2.14.0+cu130",
+  "device": "cuda",
+  "data_path": "/home/USER/sentinel-stack/data/ai4i2020.csv",
+  "temperatures": {
+    "noul": 0.916,
+    "type": 0.9393,
+    "sev": 0.3196
+  },
+  "class_support": {
+    "No Failure": 9652,
+    "TWF": 46,
+    "HDF": 115,
+    "PWF": 91,
+    "OSF": 78,
+    "RNF": 18
+  },
+  "train_seconds": 0.17,
+  "cache_hit": true,
+  "escalate": false,
+  "escalate_floor": 0.8,
+  "generative_tier": null,
+  "generative_endpoint": null,
+  "generative_max_tokens": null,
+  "question_roles": {
+    "risk": "intervention_risk",
+    "action": "next_action",
+    "evidence": "needs_evidence",
+    "clarification": "needs_clarification",
+    "side_effect": "allows_side_effect"
+  },
+  "feature_contract": {
+    "names": [
+      "air_temp_c",
+      "process_temp_c",
+      "rpm",
+      "torque_nm",
+      "tool_wear_min"
+    ],
+    "units": {
+      "air_temp_c": "C",
+      "process_temp_c": "C",
+      "rpm": "rpm",
+      "torque_nm": "Nm",
+      "tool_wear_min": "min"
+    },
+    "bounds": {
+      "air_temp_c": [
+        -20.0,
+        80.0
+      ],
+      "process_temp_c": [
+        -20.0,
+        200.0
+      ],
+      "rpm": [
+        0.0,
+        4000.0
+      ],
+      "torque_nm": [
+        0.0,
+        200.0
+      ],
+      "tool_wear_min": [
+        0.0,
+        300.0
+      ]
+    }
+  },
+  "policy": {
+    "auto_confidence": 0.8,
+    "urgent_score": 2.5,
+    "next_action_threshold": 0.7
+  }
+}

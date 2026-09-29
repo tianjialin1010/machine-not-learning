@@ -1,0 +1,14 @@
+{
+  "status": "published",
+  "previous": "/home/USER/sentinel-stack/frontend-releases/pipeline-refinement-20260929",
+  "current": "/home/USER/sentinel-stack/frontend-releases/minimal-workspace-20260929",
+  "backend_restarted": false,
+  "protected_hashes_unchanged": {
+    "sentinel_integrated.py": "4690bf12f4ab63836b29388b50a80980cdb5c1541bb550a7a9af9116cbc88ebd",
+    "industrial_runtime.py": "2eb95368df3447b6a3a8a00be09c75a8ad15ab41bb691469324d94e8503d582d",
+    "sentinel_heads.py": "3b93d7d75bd73439ad483479b558895d0e00b9d970ae4ecb5d1d0fe28489ed6e",
+    "heads.pt": "b9c7c81ae74d708273d7361faa7f5eb35a5d643612669877d14c5b95293e2070",
+    "frontend_static.py": "cd61a8369055e5786a8fab6741e00ab13b3cd491df4f08587e28c3b7b908732f"
+  },
+  "verified_files": 15
+}

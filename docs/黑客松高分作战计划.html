@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machine not Learning · DGX Spark 黑客松高分作战计划</title>
+<style>
+  :root{
+    --ink:#1F2328; --ink2:#4B5563; --ink3:#6B7280;
+    --line:#E5E7EB; --bg:#FFFFFF; --soft:#F7F8FA;
+    --nv:#76B900; --nv-dark:#5A8F00; --nv-bg:#F4FAE8;
+    --red:#C62828; --red-bg:#FEF2F2; --red-line:#FBD5D5;
+    --amber:#B26A00; --amber-bg:#FFFBEB; --amber-line:#FDE9C0;
+    --green:#1B7F3B; --green-bg:#F0FDF4; --green-line:#C7EDD4;
+    --blue:#1D4ED8; --blue-bg:#EFF6FF; --blue-line:#C7DBFB;
+    --purple:#6D28D9; --purple-bg:#F5F3FF; --purple-line:#DDD6FE;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;padding:0;background:var(--soft);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1020px;margin:0 auto;padding:40px 24px 90px;}
+  header{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:34px 36px 30px;margin-bottom:20px;position:relative;overflow:hidden;}
+  header::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--nv);}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--nv-dark);font-weight:700;margin-bottom:10px;}
+  h1{margin:0 0 8px;font-size:26px;line-height:1.35;letter-spacing:-.01em;}
+  .sub{color:var(--ink3);font-size:14px;}
+  .hero{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px;}
+  .hero .m{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:14px 16px;}
+  .hero .m .v{font-size:21px;font-weight:700;color:var(--nv-dark);letter-spacing:-.02em;line-height:1.2;}
+  .hero .m .k{font-size:12px;color:var(--ink3);margin-top:4px;}
+  section{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:28px 32px;margin-bottom:18px;}
+  h2{font-size:17px;margin:0 0 18px;padding-bottom:12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;}
+  h2 .n{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:var(--nv);color:#fff;font-size:13px;font-weight:700;flex:none;}
+  h3{font-size:14.5px;margin:22px 0 10px;color:var(--ink2);font-weight:700;}
+  h3:first-of-type{margin-top:6px;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:14px 0;}
+  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{background:var(--soft);font-weight:700;font-size:12.5px;color:var(--ink2);white-space:nowrap;}
+  td.mono{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;font-size:12.5px;}
+  tr:last-child td{border-bottom:none;}
+  .tag{display:inline-block;padding:1px 8px;border-radius:5px;font-size:12px;font-weight:700;white-space:nowrap;}
+  .t-ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-line);}
+  .t-bad{background:var(--red-bg);color:var(--red);border:1px solid var(--red-line);}
+  .t-warn{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-line);}
+  .t-info{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-line);}
+  .t-purple{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-line);}
+  pre{background:#F6F8FA;border:1px solid var(--line);border-radius:9px;padding:14px 16px;overflow-x:auto;font-size:12.5px;line-height:1.65;
+    font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;color:#24292F;margin:12px 0;}
+  code{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;font-size:.92em;background:#F1F3F5;padding:1.5px 5px;border-radius:4px;}
+  pre code{background:none;padding:0;}
+  .note{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:4px solid #E0A040;border-radius:9px;padding:14px 18px;font-size:13.5px;color:var(--ink2);margin:16px 0;}
+  .note.green{background:var(--green-bg);border-color:var(--green-line);border-left-color:var(--green);}
+  .note.red{background:var(--red-bg);border-color:var(--red-line);border-left-color:var(--red);}
+  .note.blue{background:var(--blue-bg);border-color:var(--blue-line);border-left-color:var(--blue);}
+  .note b{color:var(--ink);}
+  ul,ol{margin:10px 0;padding-left:22px;}
+  li{margin-bottom:7px;}
+  .pick{border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin:12px 0;background:var(--soft);}
+  .pick.best{border:1.5px solid var(--nv);background:var(--nv-bg);}
+  .pick h4{margin:0 0 6px;font-size:14.5px;}
+  .pick .why{font-size:13px;color:var(--ink2);}
+  .day{display:flex;gap:14px;margin:10px 0;align-items:flex-start;}
+  .day .d{flex:none;width:108px;font-size:12.5px;font-weight:700;color:#fff;background:var(--nv);border-radius:6px;padding:6px 10px;text-align:center;}
+  .day .d.done{background:#9CA3AF;}
+  .day .c{flex:1;font-size:13.5px;border-left:2px solid var(--line);padding-left:14px;}
+  footer{text-align:center;color:var(--ink3);font-size:12.5px;padding-top:14px;}
+  @media (max-width:760px){.hero{grid-template-columns:1fr 1fr;}.wrap{padding:20px 14px 60px;}section{padding:22px 18px;}header{padding:26px 20px;}.day .d{width:86px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Machine not Learning · 第三届 NVIDIA DGX Spark 黑客松</div>
+  <h1>高分作战计划：把每一分都换算成动作</h1>
+  <div class="sub">基于：赛事规则原文（9.20 训练营纪要）· 评审标准 · 我们的节点实测数据（gx10-902c）<br>当前时间 2026-09-20 21:43（北京时间）· 距截止 <b>9.29 23:59 还有 9 天</b></div>
+  <div class="hero">
+    <div class="m"><div class="v">85%</div><div class="k">分数在项目本体（25+25+20+15）</div></div>
+    <div class="m"><div class="v">15%</div><div class="k">演示视频 10% + 征文 5%，好拿的软分</div></div>
+    <div class="m"><div class="v">9.30</div><div class="k">云节点关闭，一切素材必须提前落盘</div></div>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">1</span>先读懂评分：权重决定兵力分配</h2>
+  <table>
+    <tr><th>评审项</th><th>权重</th><th>拿分要点（原文关键词）</th><th>性质</th></tr>
+    <tr>
+      <td>项目实用性、行业落地价值与技术创新性</td><td class="mono">25%</td>
+      <td>解决技术痛点、行业落地、突破传统思路、体现 DGX Spark 平台优势</td>
+      <td><span class="tag t-bad">硬分·主战场</span></td>
+    </tr>
+    <tr>
+      <td>智能体与模型优化技术深度</td><td class="mono">25%</td>
+      <td>多智能体协同、模型调优深度、Skills 设计与融合、差异化技术方案</td>
+      <td><span class="tag t-bad">硬分·主战场</span></td>
+    </tr>
+    <tr>
+      <td>项目完整性</td><td class="mono">20%</td>
+      <td>功能完整、运行稳定、前后端完整、文档规范详实、可顺利演示</td>
+      <td><span class="tag t-warn">硬分·靠工程</span></td>
+    </tr>
+    <tr>
+      <td>平台适配性</td><td class="mono">15%</td>
+      <td>DGX Spark 全栈能力 + NVIDIA 技术栈 + 开源模型/SDK + <b>StepFun 阶跃星辰模型的使用</b></td>
+      <td><span class="tag t-info">硬分·有白送分</span></td>
+    </tr>
+    <tr>
+      <td>演示效果</td><td class="mono">10%</td>
+      <td>Demo 视频流畅、展示清晰、直观呈现价值</td>
+      <td><span class="tag t-purple">软分·早准备</span></td>
+    </tr>
+    <tr>
+      <td>赛事征文（"十日谈"开发历程）</td><td class="mono">5%</td>
+      <td>参赛成果记录，每天写一点</td>
+      <td><span class="tag t-purple">软分·白送</span></td>
+    </tr>
+  </table>
+  <div class="note green">
+    <b>读出来的三个关键信息：</b><br>
+    ① <b>主题锁定「Agent Skills」</b>——Skills 不是可选项，是题眼。作品必须是「Agent + 一组设计精良的 Skills」，不是"套壳聊天机器人"。<br>
+    ② <b>平台适配性 15% 里藏着两个白送项</b>：用了 StepFun 的 token 就有分、用满 DGX Spark 特性就有分——这两项几乎零成本，必须全拿。<br>
+    ③ <b>9.30 云节点关闭</b>——评审看的是你<b>提交的材料</b>（代码+文档+Demo 视频），不是现场运行。所以 Demo 视频（10%）事实上承担了「作品能跑」的全部举证责任，它的真实权重远超 10%。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>我们的底牌：实测数据翻译成优势</h2>
+  <table>
+    <tr><th>资源</th><th>实测</th><th>在比赛里怎么变成分</th></tr>
+    <tr>
+      <td>GB10 + 121 GiB 统一内存</td>
+      <td class="mono">27B GGUF 100% GPU 卸载，34 GB 占用，13.0 tok/s（81% 带宽达成）</td>
+      <td><b>本地跑 30B 级模型是消费级显卡做不到的事</b>——「数据不出本地」的故事有实测背书，选隐私敏感场景天然站得住</td>
+    </tr>
+    <tr>
+      <td>NVMe 769G 可用 · 4.6/5.8 GB/s</td>
+      <td class="mono">顺序读写第一梯队</td>
+      <td>本地知识库/向量库/多模型共存没压力，LoRA 微调放得下数据与权重</td>
+    </tr>
+    <tr>
+      <td>8888 / 9000 公网映射</td>
+      <td class="mono">实测 CHANGE_ME_NODE_HOST:8014 → HTTP 200（95ms）</td>
+      <td>开发期内可让队友/评委随时打开真机 Demo 试玩；评审前做成视频</td>
+    </tr>
+    <tr>
+      <td>国际源全断</td>
+      <td class="mono">pypi.org / pytorch.org / nvcr.io / docker.io 全部超时</td>
+      <td>倒逼走「ollama + modelscope + 国内镜像」路线——<b>所有队都面临这个问题，谁先搭好国产源流水线谁不浪费前两天</b></td>
+    </tr>
+    <tr>
+      <td>StepFun token</td>
+      <td class="mono">已发放，登记手机号领取</td>
+      <td>「本地小模型干粗活 + StepFun 大模型干难事」的<b>混合推理架构</b>——既拿平台适配分，又天然是个技术亮点</td>
+    </tr>
+  </table>
+  <div class="note">
+    <b>一句大实话：</b>2300+ 人报名、几十支队伍，大家的硬件完全一样。<b>拉开差距的不会是谁的模型快，而是 ① 选题的落地感 ② Skills 的工程完成度 ③ 材料质量。</b>算力是公平变量，别在"炫算力"上花心思。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>选题：赢面最大的方向</h2>
+  <p>评分原文要求「深入您的行业，利用您的专业」。结合你们队名的日常关注（JCI/西门子/ABB/霍尼韦尔——工业与楼宇自动化圈子）+ 本地推理的真实优势，按赢面排序：</p>
+
+  <div class="pick best">
+    <h4>🥇 推荐：工业设备运维 Agent ——「车间边缘大脑」</h4>
+    <div class="why">
+      <b>故事线：</b>产线设备告警/巡检数据涉密，不能出厂上云。Agent 在 DGX Spark 上本地运行，通过 Skills 调用：设备手册 RAG 检索、报警分级诊断、维修工单生成、历史故障比对，给出处置建议。<br>
+      <b>为什么赢：</b>① 25% 实用性——工业运维是真实付费场景，"数据不出厂"是 DGX Spark 独有卖点，评委一听就懂；② 25% 深度——天然多智能体（诊断/检索/工单 Agent 协同），Skills 一一对应业务动作，还能 LoRA 微调一个"故障分类"小模型秀调优深度；③ 你们行业背景对口，讲得出痛点细节。
+    </div>
+  </div>
+
+  <div class="pick">
+    <h4>🥈 备选：企业合规/合同审查 Agent ——「法务不外传」</h4>
+    <div class="why">
+      合同、法务文件严禁外传是硬约束。Skills：条款抽取、风险点比对（内置法规库）、修订建议、审签流转。优势是数据好找、Demo 直观（上传合同→出报告）；劣势是同题竞争者可能多，差异化要靠 Skills 深度。
+    </div>
+  </div>
+
+  <div class="pick">
+    <h4>🥉 备选：科研文献私域助手 ——「我的论文库 Agent」</h4>
+    <div class="why">
+      本地文献库 + 检索/综述/对比 Skills。好做但同质化极高，除非有独特数据源，否则「行业落地价值」一项吃亏。
+    </div>
+  </div>
+
+  <div class="note blue">
+    <b>选题自检三问（通不过就换）：</b>① 用云端 API 是不是做不了/不该做？（如果 GPT API 也能做，DGX Spark 优势就讲不圆）② 有没有 3 个以上"一看就像 Skill"的业务动作？③ 9 天内能不能做出可演示的完整闭环？
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>技术方案：照着搭，每一项都对着评分点</h2>
+
+  <h3>4.1 总体架构（混合推理 + 多智能体 + Skills）</h3>
+  <pre><code>用户 Web UI（Gradio，绑 0.0.0.0:8888）
+        │
+  ┌─────▼─────────────────────────────────┐
+  │        编排层：多智能体协同             │
+  │  Planner（任务拆解）→ 各业务 Agent     │
+  └─────┬──────────────┬──────────────────┘
+        │              │
+  本地推理              云端推理
+  Ollama (GB10)         StepFun API
+  Qwen3-8B/27B          （大模型，复杂推理）
+  · 检索改写/分类/         · 长文分析
+    格式化/兜底          · 最终报告生成
+  · 13 tok/s 实测        · 免token额度
+        │
+  ┌─────▼─────────────────────────────────┐
+  │  Skills 层（题眼！每个都是可插拔模块）  │
+  │  S1 设备手册 RAG 检索（Chroma+本地embed）│
+  │  S2 报警诊断分级（LoRA 微调分类器）     │
+  │  S3 历史故障比对（SQLite/向量相似度）   │
+  │  S4 维修工单生成（结构化输出 JSON）     │
+  │  S5 外部工具：邮件/通知推送            │
+  └────────────────────────────────────────┘</code></pre>
+
+  <h3>4.2 评分点 → 技术动作对照表</h3>
+  <table>
+    <tr><th>评分点</th><th>对应动作</th><th>可行性（按实测）</th></tr>
+    <tr><td>多智能体协同（25%）</td><td>LangGraph 状态机编排 3 个 Agent，带中间过程可视化</td><td><span class="tag t-ok">pip 走阿里云可装</span></td></tr>
+    <tr><td>模型调优深度（25%）</td><td>对 Qwen3-8B 做领域 LoRA 微调（unsloth，节点的模型正来自 unsloth）；展示训练曲线与前后对比</td><td><span class="tag t-ok">121G 统一内存放得下 8B LoRA</span></td></tr>
+    <tr><td>Skills 设计与融合（25%）</td><td>每个 Skill 独立目录+SKILL.md 契约文档，支持热插拔，Demo 里现场装一个新 Skill</td><td><span class="tag t-ok">纯工程，最稳的分</span></td></tr>
+    <tr><td>平台适配（15%）</td><td>① 全程本地推理截图 nvidia-smi 96% 利用率 ② 调 StepFun API 做云端环节 ③ 用满统一内存跑 27B</td><td><span class="tag t-ok">白送分，全拿</span></td></tr>
+    <tr><td>前后端完整（20%）</td><td>Gradio UI + FastAPI 后端 + SQLite 持久化 + 完整 README/架构图</td><td><span class="tag t-ok">国内源全可装</span></td></tr>
+    <tr><td>运行稳定可演示（20%）</td><td>三条预置演示用例脚本化，一键跑通；加异常兜底</td><td><span class="tag t-ok">靠演练</span></td></tr>
+  </table>
+
+  <h3>4.3 环境约束下的实操命令（今天就能跑）</h3>
+  <pre><code># 1. pip 永久换国内源（国际源全断，必做）
+pip3 config set global.index-url https://mirrors.aliyun.com/pypi/simple/
+pip3 config set global.trusted-host mirrors.aliyun.com
+
+# 2. 建虚拟环境（Ubuntu 24.04 系统 Python 受管控）
+python3 -m venv ~/venv && source ~/venv/bin/activate
+
+# 3. 核心依赖（全部国内源可达）
+pip install --break-system-packages langgraph gradio fastapi uvicorn \
+    chromadb sentence-transformers requests
+
+# 4. 交互体验优化：对话类前端用 8B 模型（40+ tok/s），重任务才上 27B
+ollama pull modelscope.cn/unsloth/Qwen3-8B-GGUF   # 模型走 modelscope，国内秒下
+
+# 5. 服务启动必须绑 0.0.0.0（实测验证过，绑 127.0.0.1 公网 502）
+gradio app.py --server_name 0.0.0.0 --server_port 8888</code></pre>
+  <div class="note">
+    <b>两个型号策略：</b>Demo 交互链路用 <b>Qwen3-8B</b>（响应快，评委视频里不冷场），报告生成/复杂诊断用 <b>27B</b>（质量高），两者切换本身就是「模型优化技术深度」的论据。微调在 8B 上做，快且稳。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>9 天作战时间表（今天 9.20 晚上起算）</h2>
+  <div class="day"><div class="d done">9.20 今晚</div><div class="c"><b>D0 定题+搭台</b>：定选题、分工、拉 Git 仓库（Gitee/私有）、换 pip 源、建 venv、跑通"Hello Agent"。征文写第 1 天。</div></div>
+  <div class="day"><div class="d">9.21 周一</div><div class="c"><b>D1 数据+骨架</b>：收集领域数据（设备手册/故障记录，脱敏后入库）、搭 RAG 检索链路、多智能体骨架跑通。StepFun API 调通。</div></div>
+  <div class="day"><div class="d">9.22-9.24</div><div class="c"><b>D2-4 核心开发</b>：3~5 个 Skills 逐个实现+契约文档；多 Agent 协同逻辑；FastAPI 后端。每天征文一篇。</div></div>
+  <div class="day"><div class="d">9.25-9.26</div><div class="c"><b>D5-6 调优+前端</b>：LoRA 微调（8B，unsloth）+ 前后对比评测；Gradio 前端打磨；三条演示用例脚本化。</div></div>
+  <div class="day"><div class="d">9.27</div><div class="c"><b>D7 稳定日</b>：只修 bug 不加功能。完整 README（架构图/部署/运行）、代码注释、内测演练 3 遍。<b>全量备份到节点外</b>（git + 网盘）。</div></div>
+  <div class="day"><div class="d">9.28</div><div class="c"><b>D8 拍片日</b>：Demo 视频录制（脚本→录屏→配音→字幕），3~5 分钟；征文补齐"十日谈"全篇；文档终稿。</div></div>
+  <div class="day"><div class="d">9.29</div><div class="c"><b>D9 提交日</b>：上午最终检查，<b>下午 18:00 前提交</b>（别卡 23:59，截止前服务器必拥堵）。留 1 份只读备份。</div></div>
+  <div class="note red">
+    <b>9.30 节点就关了</b>——所有代码、模型权重、数据、视频、征文必须在 9.29 前落盘到节点之外。届时 node 上的一切都可能无法取回。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>把软分拿满：Demo 视频（10%）+ 征文（5%）</h2>
+  <h3>Demo 视频 = 作品能否跑通的唯一证据</h3>
+  <ul>
+    <li><b>结构：</b>痛点 30s → 方案一句话 → 真机演示 2.5min（重点：展示<b>多 Agent 协同过程</b>和<b>Skill 调用链</b>，不是只看聊天框）→ 本地推理证据（<code>nvidia-smi</code> 96% / ollama ps 100% GPU 画面闪一下）→ 结尾价值总结。</li>
+    <li><b>在节点上录</b>，真实展示 8888 端口公网可访问；剪辑时<b>打码 IP、端口、账号密码</b>（赛事规则明确禁止泄露凭据）。</li>
+    <li>提前写好旁白脚本，卡 5 分钟内；导出 1080p。</li>
+  </ul>
+  <h3>征文「十日谈」：每天 15 分钟，最后零成本合成</h3>
+  <ul>
+    <li>固定模板：今日进展 / 踩的坑 / 怎么解决的 / 明日计划。每天一篇，别攒到最后编——评委看得出真实感。</li>
+    <li>可以写入的真实素材我们已经有：「节点第一天连不上，如何系统排查定位」「GB10 统一内存实测」「国际源全断后的国产化流水线」——这些都是有技术含量的好章节。</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="n">7</span>红线与合规（违规=直接出局/扣分）</h2>
+  <ul>
+    <li><b>凭据零暴露</b>：视频、截图、征文、代码里不得出现 IP/端口/密码/StepFun key。<code>CHANGE_ME_NODE_HOST:6014 + CHANGE_ME_SSH_PASSWORD</code> 这类信息今天起别进任何公开材料。</li>
+    <li><b>AI 生成内容标注</b>：社媒分享作品时按平台规范标注 AI 生成。</li>
+    <li><b>只用官方渠道沟通</b>：技术问题找组委会/小助手，不在群里发泄或发布不当言论（规则写明追责）。</li>
+    <li><b>数据合规</b>：领域数据脱敏后再用，真实客户数据别上。</li>
+  </ul>
+  <h3>提交前 Checklist（9.29 逐项打勾）</h3>
+  <table>
+    <tr><td>☐</td><td>Git 仓库可访问、README 含架构图/依赖/一键运行步骤</td></tr>
+    <tr><td>☐</td><td>3 条演示用例在干净环境从头跑通</td></tr>
+    <tr><td>☐</td><td>Demo 视频 ≤5min、含 Skill 调用链展示、凭据已打码</td></tr>
+    <tr><td>☐</td><td>征文「十日谈」10 篇齐、有真实技术细节</td></tr>
+    <tr><td>☐</td><td>StepFun 调用记录截图（平台适配分证据）</td></tr>
+    <tr><td>☐</td><td>nvidia-smi / ollama ps 本地推理证据截图</td></tr>
+    <tr><td>☐</td><td>所有材料在节点外有双备份</td></tr>
+  </table>
+</section>
+
+<footer>
+  作战计划由 WorkBuddy 生成 · 数据基线：gx10-902c 真机实测（2026-09-20）<br>
+  关键假设：评审期内无法访问云节点，一切举证以提交材料为准
+</footer>
+
+</div>
+</body>
+</html>

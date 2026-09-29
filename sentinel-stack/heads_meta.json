@@ -1,0 +1,35 @@
+{
+  "features": [
+    "air_temp_c",
+    "process_temp_c",
+    "rpm",
+    "torque_nm",
+    "tool_wear_min",
+    "temp_diff",
+    "power_w",
+    "wear_torque",
+    "temp_diff_per_krpm"
+  ],
+  "types": [
+    "No Failure",
+    "TWF",
+    "HDF",
+    "PWF",
+    "OSF",
+    "RNF"
+  ],
+  "severity_labels": [
+    "观察",
+    "计划",
+    "尽快",
+    "立即"
+  ],
+  "temperatures": {
+    "noul": 0.915998,
+    "type": 0.939251,
+    "sev": 0.319616
+  },
+  "device": "cuda",
+  "torch": "2.14.0+cu130",
+  "seed": 20260921
+}

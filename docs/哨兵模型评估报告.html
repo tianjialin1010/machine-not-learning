@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>哨兵 EdgeSentinel · 决策层评估报告</title>
+<style>
+  :root{
+    --ink:#1F2328; --ink2:#4B5563; --line:#E5E7EB; --bg:#FFFFFF; --soft:#F7F8FA;
+    --nv:#76B900; --nv-dark:#5A8F00;
+    --green:#1B7F3B; --green-bg:#F0FDF4;
+    --amber:#B26A00; --amber-bg:#FFFBEB; --amber-line:#FDE9C0;
+    --red:#C62828; --red-bg:#FEF2F2; --red-line:#FBD5D5;
+    --blue:#1D4ED8; --blue-bg:#EFF6FF;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;padding:0;background:var(--soft);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1040px;margin:0 auto;padding:36px 24px 80px;}
+  header{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:30px 34px;margin-bottom:18px;position:relative;overflow:hidden;}
+  header::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--nv);}
+  .kicker{font-size:12px;letter-spacing:.14em;color:var(--nv-dark);font-weight:700;margin-bottom:8px;}
+  h1{margin:0 0 6px;font-size:24px;}
+  .sub{color:var(--ink2);font-size:13.5px;}
+  section{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:26px 30px;margin-bottom:16px;}
+  h2{font-size:17px;margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--line);}
+  h3{font-size:14px;margin:20px 0 8px;color:var(--ink2);}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0;}
+  th,td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--line);}
+  th{background:var(--soft);font-weight:700;font-size:12.5px;color:var(--ink2);}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}
+  tr:last-child td{border-bottom:none;}
+  .tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:12px;font-weight:700;}
+  .t-good{background:var(--green-bg);color:var(--green);}
+  .t-warn{background:var(--amber-bg);color:var(--amber);}
+  .t-bad{background:var(--red-bg);color:var(--red);}
+  .note{background:var(--amber-bg);border-left:4px solid #E0A040;border-radius:8px;padding:12px 16px;font-size:13px;color:var(--ink2);margin:14px 0;}
+  .note.red{background:var(--red-bg);border-left-color:var(--red);}
+  .note b{color:var(--ink);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--soft);}
+  .card .big{font-size:21px;font-weight:700;color:var(--nv-dark);font-family:ui-monospace,Menlo,monospace;}
+  .card .lbl{font-size:12px;color:var(--ink2);}
+  ul{margin:8px 0;padding-left:20px;} li{margin-bottom:5px;}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:.9em;background:#F1F3F5;padding:1px 5px;border-radius:4px;}
+  footer{text-align:center;color:var(--ink2);font-size:12px;padding-top:10px;}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr;}.wrap{padding:18px 12px 60px;}section{padding:20px 16px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">MODEL EVALUATION REPORT · 技术交接</div>
+  <h1>哨兵 EdgeSentinel · System One 决策层评估报告</h1>
+  <div class="sub">硬件：NVIDIA DGX Spark（GB10，121 GiB 统一内存，CUDA 13.0）　数据集：AI4I 2020　评估日期：2026-09-21</div>
+</header>
+
+<section>
+  <h2>0. 实验配置</h2>
+  <table>
+    <tr><th>项目</th><th>配置</th></tr>
+    <tr><td>总样本</td><td class="num">10 000 条（故障 339 条，占 3.39%）</td></tr>
+    <tr><td>数据划分</td><td class="num">训练 6000 / 校准 2000 / 测试 2000（随机种子 20260921）</td></tr>
+    <tr><td>状态编码器</td><td>9 维特征：气温、过程温度、转速、扭矩、磨损 + 温升、机械功率、磨损-负载耦合、单位转速温升</td></tr>
+    <tr><td>决策头</td><td>MLP，隐藏层 (64, 32)，ReLU，max_iter=800，random_state=20260921</td></tr>
+    <tr><td>校准方法</td><td>温度缩放（校准集最小化 NLL；二元用 logit，多元用 log-proba 作 logits）</td></tr>
+    <tr><td>生成式基线</td><td>本地 Qwen3-27B GGUF（ollama，100% GPU 卸载），实测 83.7 s/条（开思考）/ 0.7 s/条（关思考）</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>1. Noul：是否真实故障（二元判定）</h2>
+  <div class="grid2">
+    <div class="card"><div class="big">0.9616</div><div class="lbl">ROC-AUC</div></div>
+    <div class="card"><div class="big">0.7683</div><div class="lbl">PR-AUC（平均精度）</div></div>
+  </div>
+  <table>
+    <tr><th>指标</th><th class="num">数值</th><th>说明</th></tr>
+    <tr><td>Precision（精确率）</td><td class="num">0.6812</td><td>判为故障的样本中，68.1% 真为故障</td></tr>
+    <tr><td>Recall（召回率 / 灵敏度）</td><td class="num">0.6714</td><td>真实故障中被抓到 67.1%</td></tr>
+    <tr><td>F1</td><td class="num">0.6763</td><td>—</td></tr>
+    <tr><td>Specificity（特异度）</td><td class="num">0.9886</td><td>正常样本几乎不误报</td></tr>
+    <tr><td>Accuracy</td><td class="num">0.9775</td><td><span class="tag t-warn">受不平衡影响，参考即可</span></td></tr>
+    <tr><td>Balanced Accuracy</td><td class="num">0.8300</td><td><span class="tag t-good">更可信的综合指标</span></td></tr>
+    <tr><td>MCC（马修斯相关系数）</td><td class="num">0.6646</td><td>不平衡数据下最稳健的单值指标</td></tr>
+    <tr><td>ROC-AUC</td><td class="num">0.9616</td><td>排序能力强</td></tr>
+    <tr><td>PR-AUC</td><td class="num">0.7683</td><td>远高于随机基线 0.034</td></tr>
+  </table>
+  <h3>混淆矩阵（测试集 n=2000）</h3>
+  <table>
+    <tr><th></th><th class="num">预测正常</th><th class="num">预测故障</th></tr>
+    <tr><th>实际正常</th><td class="num">1908</td><td class="num">22</td></tr>
+    <tr><th>实际故障</th><td class="num">23</td><td class="num">47</td></tr>
+  </table>
+  <div class="note"><b>读法：</b>准确率 97.75% 看着漂亮，但那是因为 96.6% 的样本本来就是正常。真正该看的是 <b>Balanced Accuracy 0.830</b> 和 <b>MCC 0.665</b>——它们才反映模型在两类上的真实表现。</div>
+</section>
+
+<section>
+  <h2>2. 校准质量</h2>
+  <table>
+    <tr><th>指标</th><th class="num">校准前</th><th class="num">校准后</th></tr>
+    <tr><td>温度系数 T</td><td class="num">1.000</td><td class="num">1.183</td></tr>
+    <tr><td>ECE（10 分箱）</td><td class="num">0.0073</td><td class="num">0.0066</td></tr>
+    <tr><td>MCE（最大校准误差）</td><td class="num">0.2652</td><td class="num">0.2594</td></tr>
+    <tr><td>Brier Score</td><td class="num">0.0155</td><td class="num">0.0156</td></tr>
+  </table>
+  <h3>校准后可靠性曲线</h3>
+  <table>
+    <tr><th class="num">预测概率</th><th class="num">实际发生率</th><th class="num">样本数</th></tr>
+    <tr><td class="num">0.004</td><td class="num">0.004</td><td class="num">1853</td></tr>
+    <tr><td class="num">0.148</td><td class="num">0.069</td><td class="num">29</td></tr>
+    <tr><td class="num">0.260</td><td class="num">0.118</td><td class="num">17</td></tr>
+    <tr><td class="num">0.346</td><td class="num">0.312</td><td class="num">16</td></tr>
+    <tr><td class="num">0.443</td><td class="num">0.438</td><td class="num">16</td></tr>
+    <tr><td class="num">0.532</td><td class="num">0.273</td><td class="num">11</td></tr>
+    <tr><td class="num">0.648</td><td class="num">0.571</td><td class="num">14</td></tr>
+    <tr><td class="num">0.746</td><td class="num">0.556</td><td class="num">9</td></tr>
+    <tr><td class="num">0.848</td><td class="num">0.750</td><td class="num">12</td></tr>
+    <tr><td class="num">0.967</td><td class="num">0.957</td><td class="num">23</td></tr>
+  </table>
+  <h3>分布敏感性（同一模型，切换评估分布）</h3>
+  <table>
+    <tr><th>评估分布</th><th class="num">Accuracy</th><th class="num">ECE</th><th class="num">Brier</th></tr>
+    <tr><td>自然分布（3.4% 故障）</td><td class="num">0.978</td><td class="num">0.0066</td><td class="num">0.0156</td></tr>
+    <tr><td>均衡分布（50%，20 次抽样）</td><td class="num">0.829 ± 0.006</td><td class="num">0.1675</td><td class="num">0.1183</td></tr>
+  </table>
+  <div class="note red"><b>必须写进报告的发现：</b>校准是<b>相对部署分布</b>的。同一个模型，在自然分布下 ECE 仅 0.0066，换到均衡分布就劣化到 0.1675。部署时若真实故障率与训练分布不同，必须重新校准或做先验校正（logits 加 log(先验比)）。<b>主动披露这一点比掩饰更能体现工程深度。</b></div>
+</section>
+
+<section>
+  <h2>3. Choice：故障类型（6 分类）</h2>
+  <table>
+    <tr><th>类别</th><th class="num">Precision</th><th class="num">Recall</th><th class="num">F1</th><th class="num">Support</th></tr>
+    <tr><td>No Failure</td><td class="num">0.9826</td><td class="num">0.9979</td><td class="num">0.9902</td><td class="num">1927</td></tr>
+    <tr><td>TWF（刀具磨损）</td><td class="num">0.0000</td><td class="num">0.0000</td><td class="num">0.0000</td><td class="num">6</td></tr>
+    <tr><td>HDF（散热失效）</td><td class="num">0.8400</td><td class="num">0.7241</td><td class="num">0.7778</td><td class="num">29</td></tr>
+    <tr><td>PWF（功率失效）</td><td class="num">1.0000</td><td class="num">0.7222</td><td class="num">0.8387</td><td class="num">18</td></tr>
+    <tr><td>OSF（过载失效）</td><td class="num">0.8000</td><td class="num">0.2857</td><td class="num">0.4211</td><td class="num">14</td></tr>
+    <tr><td>RNF（随机失效）</td><td class="num">0.0000</td><td class="num">0.0000</td><td class="num">0.0000</td><td class="num">6</td></tr>
+    <tr><td><b>宏平均</b></td><td class="num"><b>0.6038</b></td><td class="num"><b>0.4550</b></td><td class="num"><b>0.5046</b></td><td class="num">2000</td></tr>
+    <tr><td>加权平均</td><td class="num">0.9735</td><td class="num">0.9805</td><td class="num">0.9758</td><td class="num">2000</td></tr>
+  </table>
+  <h3>混淆矩阵</h3>
+  <table>
+    <tr><th>实际 \ 预测</th><th class="num">NoFail</th><th class="num">TWF</th><th class="num">HDF</th><th class="num">PWF</th><th class="num">OSF</th><th class="num">RNF</th></tr>
+    <tr><th>No Failure</th><td class="num">1923</td><td class="num">0</td><td class="num">4</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+    <tr><th>TWF</th><td class="num">6</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+    <tr><th>HDF</th><td class="num">8</td><td class="num">0</td><td class="num">21</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+    <tr><th>PWF</th><td class="num">4</td><td class="num">0</td><td class="num">0</td><td class="num">13</td><td class="num">1</td><td class="num">0</td></tr>
+    <tr><th>OSF</th><td class="num">10</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">4</td><td class="num">0</td></tr>
+    <tr><th>RNF</th><td class="num">6</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+  </table>
+  <div class="note"><b>根因不是模型不行，是数据不够。</b>测试集里 TWF 只有 6 条、RNF 只有 6 条——模型根本没机会学。解决办法：① 用 StepFun 合成少数类样本；② 合并稀有类别为"其他"；③ 换用样本更均衡的数据源（如 CWRU 轴承数据集每种故障都有上千样本）。</div>
+</section>
+
+<section>
+  <h2>4. Score：维护优先级（0~3 序数）</h2>
+  <table>
+    <tr><th>等级</th><th class="num">Precision</th><th class="num">Recall</th><th class="num">F1</th><th class="num">Support</th></tr>
+    <tr><td>0 · 观察</td><td class="num">1.0000</td><td class="num">1.0000</td><td class="num">1.0000</td><td class="num">55</td></tr>
+    <tr><td>1 · 计划</td><td class="num">1.0000</td><td class="num">0.9881</td><td class="num">0.9940</td><td class="num">758</td></tr>
+    <tr><td>2 · 尽快</td><td class="num">0.9867</td><td class="num">0.9923</td><td class="num">0.9895</td><td class="num">1045</td></tr>
+    <tr><td>3 · 立即</td><td class="num">0.9448</td><td class="num">0.9648</td><td class="num">0.9547</td><td class="num">142</td></tr>
+    <tr><td><b>宏平均</b></td><td class="num"><b>0.9829</b></td><td class="num"><b>0.9863</b></td><td class="num"><b>0.9846</b></td><td class="num">2000</td></tr>
+  </table>
+  <table>
+    <tr><th>序数指标</th><th class="num">数值</th></tr>
+    <tr><td>QWK（二次加权 Kappa）</td><td class="num">0.9872</td></tr>
+    <tr><td>MAE（平均绝对误差）</td><td class="num">0.0110</td></tr>
+    <tr><td>误差 ≤1 级的比例</td><td class="num">1.0000</td></tr>
+    <tr><td>Accuracy</td><td class="num">0.9890</td></tr>
+  </table>
+  <div class="note red"><b>这一项的数字不能拿去吹。</b>0~3 的标签是<b>我们自己用磨损/温升/负载阈值派生的规则</b>，不是人工标注。QWK 0.987 只说明"模型完美学会了我们写的那条规则"，<b>不代表它学会了真实的维护优先级</b>。正式版必须由领域专家或用 StepFun 重新标注。</div>
+</section>
+
+<section>
+  <h2>5. 阈值 — 自动化率 — 准确率权衡（核心卖点）</h2>
+  <table>
+    <tr><th>阈值</th><th class="num">自动化率</th><th class="num">自动部分 Precision</th><th class="num">自动部分 Recall</th><th class="num">人工复核率</th><th class="num">自动部分错误率</th></tr>
+    <tr><td>0.60</td><td class="num">98.7%</td><td class="num">0.7586</td><td class="num">0.7333</td><td class="num">1.3%</td><td class="num">0.0152</td></tr>
+    <tr><td>0.70</td><td class="num">97.2%</td><td class="num">0.8182</td><td class="num">0.7660</td><td class="num">2.8%</td><td class="num">0.0098</td></tr>
+    <tr><td>0.80</td><td class="num">95.9%</td><td class="num">0.8857</td><td class="num">0.7750</td><td class="num">4.1%</td><td class="num">0.0068</td></tr>
+    <tr><td><b>0.90</b></td><td class="num"><b>93.8%</b></td><td class="num"><b>0.9565</b></td><td class="num"><b>0.7586</b></td><td class="num"><b>6.2%</b></td><td class="num"><b>0.0043</b></td></tr>
+    <tr><td>0.95</td><td class="num">91.5%</td><td class="num">1.0000</td><td class="num">0.7083</td><td class="num">8.5%</td><td class="num">0.0038</td></tr>
+    <tr><td>0.98</td><td class="num">87.2%</td><td class="num">1.0000</td><td class="num">0.6000</td><td class="num">12.8%</td><td class="num">0.0034</td></tr>
+  </table>
+  <div class="note"><b>汇报时这么说：</b>「阈值设 0.9，<b>93.8% 的报警可以自动处置</b>，自动部分的精确率 <b>95.65%</b>，只剩 <b>6.2%</b> 需要人工看一眼，自动部分错误率仅 <b>0.43%</b>。」—— 而这张表<b>只有做了概率校准才做得出来</b>。</div>
+</section>
+
+<section>
+  <h2>6. 延迟与吞吐</h2>
+  <table>
+    <tr><th>指标</th><th class="num">数值</th></tr>
+    <tr><td>p50 延迟</td><td class="num">0.097 ms</td></tr>
+    <tr><td>p95 延迟</td><td class="num">0.100 ms</td></tr>
+    <tr><td>p99 延迟</td><td class="num">0.100 ms</td></tr>
+    <tr><td>吞吐</td><td class="num">10 288 条/秒（三问同出）</td></tr>
+    <tr><td>生成式基线（27B，关思考，单问）</td><td class="num">700 ms/条</td></tr>
+    <tr><td>生成式基线（27B，开思考，6 问 JSON）</td><td class="num">83 700 ms/条</td></tr>
+    <tr><td>加速比（vs 开思考）</td><td class="num">约 861 000×</td></tr>
+    <tr><td>加速比（vs 关思考单问）</td><td class="num">约 7 200×</td></tr>
+  </table>
+  <div class="note"><b>诚实提示：</b>86 万倍这个数字别当卖点讲——两者能力不同（决策头只吃结构化传感器，27B 能处理任意文本）。正确说法是：<b>高频结构化判断交给 System One，罕见/模糊的才升级到生成式</b>，这正是三层路由的意义。</div>
+</section>
+
+<section>
+  <h2>7. 与生成式方案对照（均衡集 n=40）</h2>
+  <table>
+    <tr><th>指标</th><th class="num">生成式 27B 自报</th><th class="num">哨兵决策头</th><th class="num">对比</th></tr>
+    <tr><td>平均置信度</td><td class="num">0.912</td><td class="num">0.978</td><td class="num">—</td></tr>
+    <tr><td><b>实际准确率</b></td><td class="num"><b>0.475</b></td><td class="num"><b>0.829</b></td><td class="num"><b>1.75×</b></td></tr>
+    <tr><td>ECE</td><td class="num">0.4375</td><td class="num">0.1675</td><td class="num">2.6× 更准</td></tr>
+    <tr><td>Brier</td><td class="num">0.4325</td><td class="num">0.1183</td><td class="num">3.7× 更准</td></tr>
+    <tr><td>延迟</td><td class="num">700 ms</td><td class="num">0.097 ms</td><td class="num">7 202×</td></tr>
+  </table>
+  <div class="note"><b>这是整套方案的立论基石。</b>生成式模型自称 <b>91.2%</b> 把握，实际只对 <b>47.5%</b>（近乎随机），ECE 高达 0.4375——典型的 RLHF 类系统性过度自信。校准决策层正是为解决它而存在。</div>
+</section>
+
+<section>
+  <h2>8. 已知局限（交接必读）</h2>
+  <table>
+    <tr><th>局限</th><th>影响</th><th>改进方向</th></tr>
+    <tr><td>少数类样本极少（TWF 6、RNF 6）</td><td>Choice 宏平均 F1 仅 0.505</td><td>StepFun 合成 / 换 CWRU 数据集 / 稀有类合并</td></tr>
+    <tr><td>Score 标签为自己派生的规则</td><td>0.987 的 QWK 无真实含金量</td><td>领域专家或 StepFun 重新标注</td></tr>
+    <tr><td>校准依赖部署分布</td><td>换分布后 ECE 从 0.0066 升至 0.1675</td><td>先验校正 / 上线前用真实分布重新校准</td></tr>
+    <tr><td>仅单一数据源 AI4I</td><td>未验证跨设备、跨工况泛化</td><td>补充 CWRU / C-MAPSS / XJTU-SY</td></tr>
+    <tr><td>编码器为手工特征，非端到端</td><td>未利用报警文本等 unstructured 信息</td><td>接入文本 encoder（torch + ModelScope 小模型）</td></tr>
+    <tr><td>尚未服务化 / 无界面 / 未接 StepFun</td><td>当前只是评估脚本</td><td>D2 起工程化</td></tr>
+  </table>
+</section>
+
+<footer>
+  评估脚本：<code>full_eval.py</code>　复现命令：<code>cd ~/jev-service &amp;&amp; python3 full_eval.py</code>（输出 Markdown，可直接贴入汇报材料）<br>
+  全部数据源自 gx10-902c 节点真机实测，2026-09-21
+</footer>
+
+</div>
+</body>
+</html>

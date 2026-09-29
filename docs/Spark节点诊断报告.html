@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spark 云节点连通性诊断与测评方案</title>
+<style>
+  :root{
+    --ink:#1F2328; --ink2:#4B5563; --ink3:#6B7280;
+    --line:#E5E7EB; --bg:#FFFFFF; --soft:#F7F8FA;
+    --nv:#76B900; --nv-dark:#5A8F00;
+    --red:#C62828; --red-bg:#FEF2F2; --red-line:#FBD5D5;
+    --amber:#B26A00; --amber-bg:#FFFBEB; --amber-line:#FDE9C0;
+    --green:#1B7F3B; --green-bg:#F0FDF4; --green-line:#C7EDD4;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:0; background:var(--soft); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px; line-height:1.75; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:40px 24px 80px;}
+  header{
+    background:var(--bg); border:1px solid var(--line); border-radius:14px;
+    padding:34px 36px 30px; margin-bottom:22px; position:relative; overflow:hidden;
+  }
+  header::before{content:""; position:absolute; top:0; left:0; right:0; height:4px; background:var(--nv);}
+  .kicker{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--nv-dark); font-weight:700; margin-bottom:10px;}
+  h1{margin:0 0 8px; font-size:27px; line-height:1.35; letter-spacing:-.01em;}
+  .sub{color:var(--ink3); font-size:14px;}
+  .verdict{
+    margin-top:24px; background:var(--red-bg); border:1px solid var(--red-line);
+    border-left:4px solid var(--red); border-radius:10px; padding:16px 20px;
+  }
+  .verdict b{color:var(--red); font-size:15px;}
+  .verdict p{margin:6px 0 0; color:var(--ink2); font-size:14px;}
+  section{
+    background:var(--bg); border:1px solid var(--line); border-radius:14px;
+    padding:28px 32px; margin-bottom:18px;
+  }
+  h2{
+    font-size:17px; margin:0 0 18px; padding-bottom:12px; border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:10px;
+  }
+  h2 .n{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:24px; height:24px; border-radius:6px; background:var(--nv); color:#fff;
+    font-size:13px; font-weight:700; flex:none;
+  }
+  h3{font-size:14px; margin:22px 0 10px; color:var(--ink2); font-weight:700;}
+  p{margin:0 0 12px;}
+  table{width:100%; border-collapse:collapse; font-size:13.5px; margin:14px 0;}
+  th,td{padding:9px 12px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:var(--soft); font-weight:700; font-size:12.5px; color:var(--ink2); white-space:nowrap;}
+  td.mono,th.mono{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace; font-size:12.5px;}
+  tr:last-child td{border-bottom:none;}
+  .tag{display:inline-block; padding:1px 8px; border-radius:5px; font-size:12px; font-weight:700; white-space:nowrap;}
+  .t-ok{background:var(--green-bg); color:var(--green); border:1px solid var(--green-line);}
+  .t-bad{background:var(--red-bg); color:var(--red); border:1px solid var(--red-line);}
+  .t-warn{background:var(--amber-bg); color:var(--amber); border:1px solid var(--amber-line);}
+  pre{
+    background:#F6F8FA; border:1px solid var(--line); border-radius:9px;
+    padding:14px 16px; overflow-x:auto; font-size:12.5px; line-height:1.65;
+    font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace; color:#24292F; margin:12px 0;
+  }
+  code{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace; font-size:.92em; background:#F1F3F5; padding:1.5px 5px; border-radius:4px;}
+  pre code{background:none; padding:0;}
+  .note{
+    background:var(--amber-bg); border:1px solid var(--amber-line); border-left:4px solid #E0A040;
+    border-radius:9px; padding:14px 18px; font-size:13.5px; color:var(--ink2); margin:16px 0;
+  }
+  .note.green{background:var(--green-bg); border-color:var(--green-line); border-left-color:var(--green);}
+  .note b{color:var(--ink);}
+  ul,ol{margin:10px 0; padding-left:22px;}
+  li{margin-bottom:7px;}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0;}
+  .card{border:1px solid var(--line); border-radius:10px; padding:16px 18px; background:var(--soft);}
+  .card h4{margin:0 0 8px; font-size:13.5px;}
+  .card .big{font-size:22px; font-weight:700; color:var(--nv-dark); letter-spacing:-.02em;}
+  .card .lbl{font-size:12px; color:var(--ink3); margin-top:2px;}
+  footer{text-align:center; color:var(--ink3); font-size:12.5px; padding-top:14px;}
+  @media (max-width:680px){.grid{grid-template-columns:1fr;} .wrap{padding:20px 14px 60px;} section{padding:22px 18px;} header{padding:26px 20px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">NVIDIA DGX Spark 黑客松 · 节点体检报告</div>
+  <h1>Spark 云节点（序号 64 / gx10-902c）连通性诊断与测评方案</h1>
+  <div class="sub">队伍：Machine not Learning &nbsp;·&nbsp; 公网入口：CHANGE_ME_NODE_HOST &nbsp;·&nbsp; 诊断时间：2026-09-20 14:40（北京时间）</div>
+
+  <div class="verdict">
+    <b>结论：节点当前不可用，问题在服务端，不在你的本地网络。</b>
+    <p>公网网关对 6014 / 7014 / 8014 / 9014 四个端口都能完成 TCP 握手，但后端节点（CHANGE_ME_INTERNAL_HOST）从始至终不回任何数据包——SSH 卡在 banner 交换阶段直至超时，最长等待 45 秒。同一时间，组委会旧版手册里的公网入口 CHANGE_ME_PLATFORM_HOST 的 SSH 服务完全正常，返回真实 OpenSSH 9.6p1（Ubuntu）横幅。<b>说明平台本身健康，是你这一台节点的映射/实例没起来。</b></p>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">1</span>手上拿到的资源</h2>
+  <table>
+    <tr><th>项目</th><th>值</th></tr>
+    <tr><td>序号 / 主机名</td><td class="mono">64 / gx10-902c</td></tr>
+    <tr><td>公网入口</td><td class="mono">CHANGE_ME_NODE_HOST</td></tr>
+    <tr><td>SSH</td><td class="mono">CHANGE_ME_NODE_HOST:6014 &nbsp;→&nbsp; CHANGE_ME_INTERNAL_HOST:22</td></tr>
+    <tr><td>端口转发 1</td><td class="mono">CHANGE_ME_NODE_HOST:7014 &nbsp;→&nbsp; CHANGE_ME_INTERNAL_HOST:7000</td></tr>
+    <tr><td>端口转发 2</td><td class="mono">CHANGE_ME_NODE_HOST:8014 &nbsp;→&nbsp; CHANGE_ME_INTERNAL_HOST:8888</td></tr>
+    <tr><td>端口转发 3</td><td class="mono">CHANGE_ME_NODE_HOST:9014 &nbsp;→&nbsp; CHANGE_ME_INTERNAL_HOST:9000</td></tr>
+    <tr><td>账号</td><td class="mono">USER / CHANGE_ME_SSH_PASSWORD</td></tr>
+    <tr><td>登录命令</td><td class="mono">ssh -p 6014 USER@CHANGE_ME_NODE_HOST</td></tr>
+  </table>
+  <div class="note">
+    <b>硬件本体（对照官方规格）：</b>DGX Spark 搭载 GB10 Grace Blackwell 超级芯片——20 核 Arm CPU（10×Cortex-X925 + 10×Cortex-A725）、Blackwell 架构 GPU（第 5 代 Tensor Core）、128 GB LPDDR5x 统一内存、273 GB/s 内存带宽、最高 1 PFLOP FP4（稀疏）算力、4 TB NVMe、ConnectX-7 200 Gbps 网卡、整机 TDP 140 W。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>实测证据</h2>
+
+  <h3>2.1 分配给你的节点：全部无响应</h3>
+  <table>
+    <tr><th>探测目标</th><th>TCP 握手</th><th>协议响应</th><th>判定</th></tr>
+    <tr>
+      <td class="mono">CHANGE_ME_NODE_HOST:6014（SSH）</td>
+      <td>成功</td><td>45 秒无任何字节返回</td>
+      <td><span class="tag t-bad">不可用</span></td>
+    </tr>
+    <tr>
+      <td class="mono">CHANGE_ME_NODE_HOST:7014</td>
+      <td>成功</td><td>无响应</td><td><span class="tag t-bad">不可用</span></td>
+    </tr>
+    <tr>
+      <td class="mono">CHANGE_ME_NODE_HOST:8014（8888）</td>
+      <td>成功</td><td>无响应</td><td><span class="tag t-bad">不可用</span></td>
+    </tr>
+    <tr>
+      <td class="mono">CHANGE_ME_NODE_HOST:9014（9000）</td>
+      <td>成功</td><td>无响应</td><td><span class="tag t-bad">不可用</span></td>
+    </tr>
+  </table>
+
+  <h3>2.2 真实 SSH 客户端报错原文</h3>
+  <pre><code>$ ssh -vv -p 6014 USER@CHANGE_ME_NODE_HOST
+debug1: Connecting to CHANGE_ME_NODE_HOST [CHANGE_ME_NODE_HOST] port 6014.
+debug1: Connection established.
+debug1: Local version string SSH-2.0-OpenSSH_10.2
+Connection timed out during banner exchange     ← 卡在这里，服务端一句都没回
+Connection to CHANGE_ME_NODE_HOST port 6014 timed out.</code></pre>
+
+  <h3>2.3 关键反证：网关在「无脑放行」，端口通不等于服务活着</h3>
+  <p>我向该 IP 上若干<strong>根本不可能存在服务</strong>的端口发起连接，全部返回「连接成功」——这证明前面的握手成功毫无参考价值：</p>
+  <table>
+    <tr><th>目标端口</th><th>TCP 握手</th><th>说明</th></tr>
+    <tr><td class="mono">12345</td><td><span class="tag t-warn">成功</span></td><td>随机端口，不可能有服务</td></tr>
+    <tr><td class="mono">54321</td><td><span class="tag t-warn">成功</span></td><td>随机端口，不可能有服务</td></tr>
+    <tr><td class="mono">6015 / 6020</td><td><span class="tag t-warn">成功</span></td><td>不属于任何分配端口</td></tr>
+    <tr><td class="mono">8.8.8.8:9999</td><td><span class="tag t-warn">成功</span></td><td>公网对照，同样被放行</td></tr>
+  </table>
+  <p>也就是说，<strong>能连上只代表中间那层防火墙接受了 SYN，不代表后端有一台机器在听</strong>。真正的判据是「有没有协议数据回包」，而你的四个端口一个字节都没回。</p>
+
+  <h3>2.4 对照组：平台整体是健康的</h3>
+  <table>
+    <tr><th>目标</th><th>协议响应</th><th>判定</th></tr>
+    <tr>
+      <td class="mono">CHANGE_ME_PLATFORM_HOST:6052</td>
+      <td class="mono">SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.14</td>
+      <td><span class="tag t-ok">正常</span></td>
+    </tr>
+    <tr>
+      <td class="mono">CHANGE_ME_PLATFORM_HOST:6053 / 6060 / 6070 / 6080</td>
+      <td class="mono">SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.18</td>
+      <td><span class="tag t-ok">正常</span></td>
+    </tr>
+    <tr>
+      <td class="mono">CHANGE_ME_PLATFORM_HOST:6051 / 6100</td>
+      <td class="mono">Exceeded MaxStartups</td>
+      <td><span class="tag t-warn">过载</span></td>
+    </tr>
+    <tr>
+      <td class="mono">github.com:22</td>
+      <td class="mono">SSH-2.0-...</td>
+      <td><span class="tag t-ok">方法有效</span></td>
+    </tr>
+  </table>
+  <p>旧手册入口上多台节点返回了带真实密钥交换数据的 SSH 横幅，证明探测方法可靠、外网通道无碍。唯一异常的是你这一台。</p>
+</section>
+
+<section>
+  <h2><span class="n">3</span>根因判定</h2>
+  <ol>
+    <li><b>最可能：该节点实例未启动 / 未挂载到映射。</b>端口映射规则已下发，但后端 CHANGE_ME_INTERNAL_HOST 上的 sshd 没有运行，或这台 Spark 根本没开机、没接入反向隧道。</li>
+    <li><b>次可能：映射配置指向了错误的内部地址。</b>分配表里主机名是 <code>gx10-902c</code>，而旧手册的主机名规范是 <code>spark-51 ~ spark-100</code>，且内部网段写的是 <code>CHANGE_ME_INTERNAL_HOST</code>，你的是 <code>CHANGE_ME_INTERNAL_HOST</code>。命名与网段两套体系不一致，说明你这批可能是新加的一批机器，映射表存在配置错误的可能。</li>
+    <li><b>已排除：本地网络问题。</b>同一台机器访问对照组 SSH 正常，网络出口无碍。</li>
+  </ol>
+  <div class="note">
+    <b>另外注意：</b>分配表给你的公网 IP 是 <code>CHANGE_ME_NODE_HOST</code>，而官方手册通篇写的是 <code>CHANGE_ME_PLATFORM_HOST</code>。两者都活着，但只有后者能看到在跑 SSH 的节点。请向组委会确认哪个才是本届的正式入口。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>建议立即处理的动作</h2>
+  <h3>4.1 给组委会 / 运营群里发这条</h3>
+  <pre><code>【节点无法登录 · 64 号 · Machine not Learning】
+主机名 gx10-902c，公网 CHANGE_ME_NODE_HOST，SSH 端口 6014。
+现象：TCP 能握手，但 SSH 卡在 banner exchange 直到超时
+（ssh -vv 输出：Connection timed out during banner exchange），
+7014/8014/9014 三个转发端口同样无任何响应，已重试 5 次、单次等待 45 秒。
+对照：CHANGE_ME_PLATFORM_HOST:6052 等端口 SSH 正常（OpenSSH_9.6p1 Ubuntu），
+排除我方网络问题。
+请协助确认：① 该实例是否已开机 / sshd 是否在跑；
+② CHANGE_ME_NODE_HOST 是否为本届正式入口；
+③ 映射规则是否有变更。</code></pre>
+
+  <h3>4.2 你自己可以顺手做的</h3>
+  <ul>
+    <li>公司/校园网络若有出口白名单，先用手机热点试一次——虽然本次判断不是你这边的问题，但多一条证据更硬气。</li>
+    <li>每 30~60 分钟重试一次即可，<b>不要高频重试</b>。网关已经出现 <code>Exceeded MaxStartups</code>（连接数超限）的节点，说明有人在猛刷，会影响其他队伍。</li>
+    <li>把 <code>spark_run.sh</code> 放在手边，节点一通就能一键跑完测评。</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="n">5</span>节点恢复后怎么测评（脚本已备好）</h2>
+  <p>我已写好两个脚本，放在工作目录：</p>
+  <table>
+    <tr><th>文件</th><th>运行位置</th><th>作用</th></tr>
+    <tr>
+      <td class="mono">spark_run.sh</td>
+      <td>你的 Mac</td>
+      <td>先检测节点是否可达；通了就自动上传脚本、执行测评、取回报告。<br>用法：<code>./spark_run.sh</code>，只检测：<code>./spark_run.sh check</code></td>
+    </tr>
+    <tr>
+      <td class="mono">spark_bench.sh</td>
+      <td>节点上</td>
+      <td>九大项完整测评，输出 <code>report.txt</code>。<br>用法：<code>bash spark_bench.sh</code></td>
+    </tr>
+  </table>
+
+  <h3>测评覆盖项</h3>
+  <div class="grid">
+    <div class="card"><h4>① CPU</h4><div class="big">20 核 Arm</div><div class="lbl">lscpu + 单/多线程基准 + 加速比</div></div>
+    <div class="card"><h4>② 内存</h4><div class="big">128 GB</div><div class="lbl">容量确认 + 拷贝带宽实测</div></div>
+    <div class="card"><h4>③ GPU</h4><div class="big">GB10</div><div class="lbl">nvidia-smi + 驱动/CUDA 版本 + 拓扑</div></div>
+    <div class="card"><h4>④ 磁盘</h4><div class="big">4 TB NVMe</div><div class="lbl">顺序读写 dd + 随机 4K（若有 fio）</div></div>
+    <div class="card"><h4>⑤ 网络</h4><div class="big">出口带宽</div><div class="lbl">实测下载速率 + 延迟</div></div>
+    <div class="card"><h4>⑥ 软件栈</h4><div class="big">DGX OS</div><div class="lbl">CUDA / PyTorch / Docker / vLLM 盘点</div></div>
+    <div class="card"><h4>⑦ GPU 算力</h4><div class="big">TFLOPS</div><div class="lbl">FP32 / BF16 / FP8 矩阵乘实测</div></div>
+    <div class="card"><h4>⑧ 推理</h4><div class="big">tokens/s</div><div class="lbl">Ollama / vLLM 实际吞吐</div></div>
+  </div>
+
+  <h3>拿到结果后怎么判断"好不好"</h3>
+  <table>
+    <tr><th>指标</th><th>官方规格 / 健康区间</th><th>低于此值需警惕</th></tr>
+    <tr><td>GPU 识别</td><td class="mono">GB10 / Blackwell</td><td>识别不出或显存 &lt; 100 GB → 环境异常</td></tr>
+    <tr><td>显存容量</td><td class="mono">128 GB 统一内存</td><td>&lt; 110 GB 说明被别的进程占用</td></tr>
+    <tr><td>内存带宽</td><td class="mono">273 GB/s（理论）</td><td>实测 &lt; 150 GB/s 需排查</td></tr>
+    <tr><td>BF16 矩阵乘</td><td class="mono">数十 TFLOPS 量级</td><td>明显偏低 → 未开 Tensor Core 或降频</td></tr>
+    <tr><td>FP4 峰值</td><td class="mono">最高 1 PFLOP（稀疏，理论值）</td><td>常规实测远达不到，属正常</td></tr>
+    <tr><td>NVMe 顺序读写</td><td class="mono">数 GB/s</td><td>&lt; 1 GB/s → 磁盘或虚拟化层有瓶颈</td></tr>
+    <tr><td>出口带宽</td><td>—</td><td>注意：50 台共用一条公网出口，慢属正常</td></tr>
+  </table>
+  <div class="note green">
+    <b>测评时的一个坑：</b>Spark 是 Arm64 架构，<code>pip install</code> 时很多包没有预编译轮子，会现场编译甚至失败。优先用 NVIDIA 官方 NGC 容器（<code>docker run --gpus all nvcr.io/nvidia/pytorch:xx.xx-py3</code>），省掉全部环境折腾。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>安全提醒</h2>
+  <div class="note">
+    <b>你的账号密码已经出现在这次对话里了。</b>组委会手册明确要求「勿在公开群聊、代码仓库、演示截图或技术博客中泄露账号密码与端口信息」。建议：<br>
+    ① 本次测评完成后，向组委会申请重置密码；<br>
+    ② 后续把凭据写进 <code>~/.ssh/config</code>，不要再明文粘贴；<br>
+    ③ 8888 / 9000 是<b>直接暴露在公网</b>的端口，任何知道 IP 和端口的人都能访问，起服务时务必带 token 或密码认证，用完及时关。
+  </div>
+  <div class="note green">
+    <b>顺带一提：</b>邮件里那份 StepFun AI Coding Plan 领取链接（<code>platform.stepfun.com</code>）是官方域名，可以正常领取，但链接与你的报名手机号绑定，别转发。
+  </div>
+</section>
+
+<footer>
+  报告由 WorkBuddy 自动生成 · 数据来源：现场实网探测 + NVIDIA 官方规格页<br>
+  节点恢复联网后，重跑 <code>./spark_run.sh</code> 即可获得完整性能实测数据
+</footer>
+
+</div>
+</body>
+</html>

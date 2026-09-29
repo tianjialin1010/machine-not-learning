@@ -1,0 +1,70 @@
+[
+  {
+    "id": "skab:other/1.csv:2",
+    "label": "normal",
+    "expected_class": "normal",
+    "features": {
+      "Accelerometer1RMS": 0.0820647,
+      "Accelerometer2RMS": 0.133521,
+      "Current": 1.27794,
+      "Pressure": 0.054711,
+      "Temperature": 92.2562,
+      "Thermocouple": 22.2577,
+      "Voltage": 209.639,
+      "Volume Flow RateRMS": 76.0197
+    },
+    "split": "test",
+    "source_row": "other/1.csv:2"
+  },
+  {
+    "id": "skab:other/1.csv:3",
+    "label": "normal",
+    "expected_class": "normal",
+    "features": {
+      "Accelerometer1RMS": 0.0827238,
+      "Accelerometer2RMS": 0.132378,
+      "Current": 1.12118,
+      "Pressure": -0.273216,
+      "Temperature": 92.0144,
+      "Thermocouple": 22.2577,
+      "Voltage": 221.25,
+      "Volume Flow RateRMS": 76.9806
+    },
+    "split": "test",
+    "source_row": "other/1.csv:3"
+  },
+  {
+    "id": "skab:other/1.csv:559",
+    "label": "fault",
+    "expected_class": "fault",
+    "features": {
+      "Accelerometer1RMS": 0.0796652,
+      "Accelerometer2RMS": 0.130515,
+      "Current": 1.79592,
+      "Pressure": 0.054711,
+      "Temperature": 90.1938,
+      "Thermocouple": 22.2448,
+      "Voltage": 231.964,
+      "Volume Flow RateRMS": 77.0
+    },
+    "split": "test",
+    "source_row": "other/1.csv:559"
+  },
+  {
+    "id": "skab:other/1.csv:560",
+    "label": "fault",
+    "expected_class": "fault",
+    "features": {
+      "Accelerometer1RMS": 0.0808769,
+      "Accelerometer2RMS": 0.127444,
+      "Current": 1.69335,
+      "Pressure": 0.382638,
+      "Temperature": 90.0013,
+      "Thermocouple": 22.2372,
+      "Voltage": 233.18,
+      "Volume Flow RateRMS": 77.0
+    },
+    "split": "test",
+    "source_row": "other/1.csv:560"
+  }
+]

@@ -1,0 +1,34 @@
+{
+  "ok": true,
+  "previous": "/home/USER/sentinel-stack/frontend-releases/minimal-workspace-20260929-r2",
+  "current": "/home/USER/sentinel-stack/frontend-releases/studio-recovery-20260929",
+  "backend_restarted": false,
+  "protected_hashes": {
+    "sentinel_integrated.py": "4690bf12f4ab63836b29388b50a80980cdb5c1541bb550a7a9af9116cbc88ebd",
+    "industrial_runtime.py": "2eb95368df3447b6a3a8a00be09c75a8ad15ab41bb691469324d94e8503d582d",
+    "sentinel_heads.py": "3b93d7d75bd73439ad483479b558895d0e00b9d970ae4ecb5d1d0fe28489ed6e",
+    "heads.pt": "b9c7c81ae74d708273d7361faa7f5eb35a5d643612669877d14c5b95293e2070",
+    "frontend_static.py": "cd61a8369055e5786a8fab6741e00ab13b3cd491df4f08587e28c3b7b908732f"
+  },
+  "files": {
+    "assets/Bench-BXitJKe1.js": "751e124b1455fd270a171a46322c53e6a37926c85a6c0d662e9da012b805f44d",
+    "assets/PlantScene-DfmPMHXo.js": "aeae8a571b95f586350aa14bff2bd25541a993f845adc6d0fe93e1ab1bf2fc8d",
+    "assets/index-DNkDPN7f.css": "954c358c49a9f3f6aa72a0db13cdd0c8cdd4d80f437e66e3849560fd864cc792",
+    "assets/index-fAA2Y9kQ.js": "fea21da8b19573c0657a9b6afe51d682692d8c72d2ccf0ad426c2d2a490a44c9",
+    "fonts/jetbrains-mono-2.woff2": "c2448f39d2995cce27b6f4b0abc8480bb89176bbb9685d816d44cd9ae46f4dff",
+    "fonts/noto-sans-sc-3.woff2": "4c38b9a69f01acab11af1519237e9cc8393f38352b2c6dfa15a2f9e7ebd88e46",
+    "fonts/space-grotesk-1.woff2": "7370e6996910f3716b885decd9ea8c5c743c9e7d881efd44139702cbe2c52e68",
+    "fonts.css": "d56114bbf0a00104f1dc63248016e6683a2a901c0fa609f295bd1f685585bad4",
+    "index.html": "5540444da15a67b179d8b473df73d95232a0bdbc591d0db622261805a34acdb6",
+    "models/ai4i.glb": "103d8211d63d38f20ac35d1c736f0eeb083bc2a4218e2f8b83983a017b8690e7",
+    "models/secom.glb": "8bab4a146d1b3c716cf10e479748c5435ad75dd2a539234e0308302fb488f6a6",
+    "models/skab.glb": "89c078c80fce35b1fdee29db339675d267d979126f4e9b3a802efb93e1dc84d1",
+    "models/steel.glb": "3401320696a390e100686f9afe36a4bca2bcfd98112df8b43e75b7481523edcb",
+    "models/tep.glb": "19db23cd711b3245350bca85b6afdbe29047de0d92363503d1123ceb1b2d8fef"
+  },
+  "health": {
+    "ok": true,
+    "device": "cuda",
+    "decision_head": "sentinel-mlp@cuda"
+  }
+}

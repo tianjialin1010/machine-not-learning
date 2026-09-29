@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>哨兵 EdgeSentinel · 满分作战方案 v2</title>
+<style>
+  :root{
+    --ink:#1F2328; --ink2:#4B5563; --ink3:#6B7280;
+    --line:#E5E7EB; --bg:#FFFFFF; --soft:#F7F8FA;
+    --nv:#76B900; --nv-dark:#5A8F00; --nv-bg:#F4FAE8;
+    --red:#C62828; --red-bg:#FEF2F2; --red-line:#FBD5D5;
+    --amber:#B26A00; --amber-bg:#FFFBEB; --amber-line:#FDE9C0;
+    --green:#1B7F3B; --green-bg:#F0FDF4; --green-line:#C7EDD4;
+    --blue:#1D4ED8; --blue-bg:#EFF6FF; --blue-line:#C7DBFB;
+    --purple:#6D28D9; --purple-bg:#F5F3FF; --purple-line:#DDD6FE;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;padding:0;background:var(--soft);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1020px;margin:0 auto;padding:40px 24px 90px;}
+  header{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:34px 36px 30px;margin-bottom:20px;position:relative;overflow:hidden;}
+  header::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--nv);}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--nv-dark);font-weight:700;margin-bottom:10px;}
+  h1{margin:0 0 8px;font-size:26px;line-height:1.35;letter-spacing:-.01em;}
+  .sub{color:var(--ink3);font-size:14px;}
+  .hero{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px;}
+  .hero .m{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:14px 16px;}
+  .hero .m .v{font-size:20px;font-weight:700;color:var(--nv-dark);letter-spacing:-.02em;line-height:1.2;}
+  .hero .m .k{font-size:12px;color:var(--ink3);margin-top:4px;}
+  section{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:28px 32px;margin-bottom:18px;}
+  h2{font-size:17px;margin:0 0 18px;padding-bottom:12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;}
+  h2 .n{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:var(--nv);color:#fff;font-size:13px;font-weight:700;flex:none;}
+  h3{font-size:14.5px;margin:22px 0 10px;color:var(--ink2);font-weight:700;}
+  h3:first-of-type{margin-top:6px;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:14px 0;}
+  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{background:var(--soft);font-weight:700;font-size:12.5px;color:var(--ink2);white-space:nowrap;}
+  td.mono{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;font-size:12.5px;}
+  tr:last-child td{border-bottom:none;}
+  .tag{display:inline-block;padding:1px 8px;border-radius:5px;font-size:12px;font-weight:700;white-space:nowrap;}
+  .t-ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-line);}
+  .t-bad{background:var(--red-bg);color:var(--red);border:1px solid var(--red-line);}
+  .t-warn{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-line);}
+  .t-info{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-line);}
+  pre{background:#F6F8FA;border:1px solid var(--line);border-radius:9px;padding:14px 16px;overflow-x:auto;font-size:12.5px;line-height:1.65;
+    font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;color:#24292F;margin:12px 0;}
+  code{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;font-size:.92em;background:#F1F3F5;padding:1.5px 5px;border-radius:4px;}
+  pre code{background:none;padding:0;}
+  .note{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:4px solid #E0A040;border-radius:9px;padding:14px 18px;font-size:13.5px;color:var(--ink2);margin:16px 0;}
+  .note.green{background:var(--green-bg);border-color:var(--green-line);border-left-color:var(--green);}
+  .note.red{background:var(--red-bg);border-color:var(--red-line);border-left-color:var(--red);}
+  .note.blue{background:var(--blue-bg);border-color:var(--blue-line);border-left-color:var(--blue);}
+  .note b{color:var(--ink);}
+  ul,ol{margin:10px 0;padding-left:22px;}
+  li{margin-bottom:7px;}
+  .day{display:flex;gap:14px;margin:10px 0;align-items:flex-start;}
+  .day .d{flex:none;width:106px;font-size:12.5px;font-weight:700;color:#fff;background:var(--nv);border-radius:6px;padding:6px 10px;text-align:center;}
+  .day .c{flex:1;font-size:13.5px;border-left:2px solid var(--line);padding-left:14px;}
+  footer{text-align:center;color:var(--ink3);font-size:12.5px;padding-top:14px;}
+  @media (max-width:760px){.hero{grid-template-columns:1fr;}.wrap{padding:20px 14px 60px;}section{padding:22px 18px;}header{padding:26px 20px;}.day .d{width:86px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Machine not Learning · 第三届 NVIDIA DGX Spark 黑客松 · 方案 v2</div>
+  <h1>哨兵 EdgeSentinel —— 满分作战方案</h1>
+  <div class="sub">工业场景 · System One 校准决策架构本地复现 · Spark + NVIDIA 技术栈 + StepFun 三要素吃满<br>制定时间 2026-09-21 16:30（北京时间）· 距 9.29 23:59 还有 <b>8 天</b></div>
+  <div class="hero">
+    <div class="m"><div class="v">CUDA 13.0.2</div><div class="k">完整 SDK，nvcc + cuBLAS + Nsight 全在</div></div>
+    <div class="m"><div class="v">StepFun 可达</div><div class="k">已实测从节点直连成功</div></div>
+    <div class="m"><div class="v">Nsight 双件套</div><div class="k">nsys + ncu 可出性能剖析证据</div></div>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">1</span>本轮实测新发现（决定方案走向）</h2>
+  <table>
+    <tr><th>能力</th><th>实测结果</th><th>对方案的影响</th></tr>
+    <tr><td>CUDA SDK</td><td class="mono">/usr/local/cuda-13.0，nvcc 13.0.88，cuBLAS 13.1</td><td><span class="tag t-ok">可自研 CUDA 组件</span>能自己写并行决策头，正面复现 Jev 的并行采样器</td></tr>
+    <tr><td>Nsight</td><td class="mono">nsys、nsys-ui、ncu、ncu-ui、cuda-gdb 均在 /usr/local/cuda/bin</td><td><span class="tag t-ok">性能剖析证据</span>可出系统时间线与 kernel 级报告，NVIDIA 技术栈的硬证据</td></tr>
+    <tr><td>StepFun</td><td class="mono">api.stepfun.com 从节点可达（HTTP 404 说明域名与 TLS 通）</td><td><span class="tag t-ok">可用</span>云端最高层能真正跑通，不是纸面设计</td></tr>
+    <tr><td>torch</td><td class="mono">阿里云源有 cp312 aarch64 轮子；numpy 2.5.3 + sklearn 已装</td><td><span class="tag t-ok">可训决策头</span>encoder + 分类头 + 校准全链路可落地</td></tr>
+    <tr><td>编译链</td><td class="mono">gcc / g++ / make 有，cmake 缺（可 pip 装）</td><td><span class="tag t-info">可选</span>需要时可自行编译 llama.cpp 上 CUDA</td></tr>
+    <tr><td>ollama embedding</td><td class="mono">不支持，<code>--embeddings</code> 标志在新版已移除</td><td><span class="tag t-warn">改道</span>不能靠 ollama 取向量/logprobs，需自建 encoder 路径</td></tr>
+    <tr><td>ollama logprobs</td><td class="mono">参数被接受但不返回概率分布</td><td><span class="tag t-warn">改道</span>同上，概率必须由我们自己的决策头产出</td></tr>
+    <tr><td>github / pypi.nvidia.com</td><td class="mono">均超时不可达</td><td><span class="tag t-warn">受限</span>只能走 ModelScope + 国内 PyPI 镜像</td></tr>
+    <tr><td>剩余资源</td><td class="mono">磁盘 768 GB 可用，内存 111 GB 可用</td><td><span class="tag t-ok">充裕</span>放得下多模型与数据集</td></tr>
+  </table>
+  <div class="note">
+    <b>最重要的一条结论：</b>取不到模型内部 logprobs，乍看是打击，实际是<b>把架构逼成了真正的 System One</b>——概率不再靠"让大模型口头报置信度"（那正是 RLHF 模型系统性过度自信的根源），而是由<b>我们自己训练并校准的决策头</b>产出。这比"套壳调 API 拿 logprobs"深一个层次，也更贴合 Jev 的原始思想。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>技术架构：System One + 三层路由 + System Two</h2>
+  <pre><code>报警事件流（传感器仿真 / 真实数据）
+        │
+        ▼
+┌───────────────────────────────────────────┐
+│  System One 决策层（本地，毫秒级）          │
+│  encoder（小模型单次前向→状态向量）         │
+│      ↓                                     │
+│  决策头 × N（每个问题一个，训练得到）       │
+│      ↓  softmax                            │
+│  温度缩放 / 保序回归校准（校准集拟合）      │
+│      ↓                                     │
+│  类型化决策 + 校准概率 + confidence         │
+│  · Noul  是不是  → 0~1 概率                │
+│  · Choice 选哪个 → 分布（≤255 选项）        │
+│  · Score  打几分 → 等级分布 + 加权分        │
+└───────────────────────────────────────────┘
+        │ 按置信度路由
+        ├── ≥0.9 ──► 自动处置（工单 / 联动）
+        ├── 0.6–0.9 ─► 人工复核台
+        └── &lt;0.6 ──► System Two 深度分析
+                        │
+                        ├─ 多智能体：Planner / 检索 / 诊断 / 报告
+                        ├─ RAG：设备手册 + 故障案例库 + 国标
+                        ├─ 本地 27B 生成式推理（GB10，100% GPU）
+                        └─ StepFun 云端：难例终审 + 报告生成</code></pre>
+
+  <h3>三种决策原语在场景里的具体映射</h3>
+  <table>
+    <tr><th>原语</th><th>本场景的问题定义</th><th>输出</th></tr>
+    <tr><td>Noul</td><td>该报警是否为真实故障（非误报）？</td><td class="mono">0~1 概率</td></tr>
+    <tr><td>Choice</td><td>故障类型：过热 / 磨损 / 失衡 / 电气 / 润滑 / 其他</td><td class="mono">分布 + 置信度</td></tr>
+    <tr><td>Score</td><td>紧急程度（1~5 级：观察 / 计划 / 尽快 / 立即 / 停机）</td><td class="mono">等级分布 + 加权分</td></tr>
+    <tr><td>Noul</td><td>是否需要立即停机？</td><td class="mono">0~1 概率</td></tr>
+    <tr><td>Choice</td><td>路由到哪个班组 / 工单队列？</td><td class="mono">分布</td></tr>
+  </table>
+  <div class="note green">
+    <b>一次前向回答全部问题</b>——这正是 Jev 的"并行采样器"思想：所有问题共享同一份状态编码，一次计算同时输出全部分布，而不是把 N 个问题拼成提示词再逐 token 生成 N 次。延迟与成本几乎与问题数无关，这一点要在演示里专门对比。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">3</span>与 Jev 的对标：我们的差异化在哪里</h2>
+  <table>
+    <tr><th>维度</th><th>Jev（云端 API）</th><th>哨兵（本地实现）</th><th>评委视角</th></tr>
+    <tr><td>部署位置</td><td>云端，数据出境</td><td>车间本地，数据不出厂</td><td><span class="tag t-ok">工业刚需</span></td></tr>
+    <tr><td>获取方式</td><td>排队制、不开源、按次收费</td><td>DGX Spark 本地，零边际成本</td><td><span class="tag t-ok">可复现</span></td></tr>
+    <tr><td>校准证据</td><td><b>未公开</b>可靠性曲线 / ECE / Brier</td><td><b>我们公开</b>校准前后曲线与 ECE</td><td><span class="tag t-ok">硬证据</span></td></tr>
+    <tr><td>准确率自评</td><td>67.8% vs 最优 74.1%（口径为模型一致率）</td><td>我们用同一口径自评，诚实披露</td><td><span class="tag t-ok">工程诚实</span></td></tr>
+    <tr><td>决策头训练</td><td>闭源</td><td>可解释：权重可导出、阈值可调</td><td><span class="tag t-ok">可控</span></td></tr>
+    <tr><td>执行层</td><td>纯 API</td><td>CUDA 并行决策头（可用 nvcc 自研）</td><td><span class="tag t-ok">技术栈深度</span></td></tr>
+  </table>
+  <div class="note">
+    <b>一句话定位（路演开场用）：</b>「Jev 证明了把判断从表达里拆出来能带来两个数量级的经济性；我们证明这件事可以在一台 DGX Spark 上、在车间里、在数据不出厂的前提下完成，并且把 Jev 没公开的校准证据补齐了。」
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>平台适配性 15% —— 逐项吃满清单</h2>
+  <table>
+    <tr><th>要素</th><th>我们能怎么用</th><th>状态</th></tr>
+    <tr><td>GB10 本地推理</td><td>27B GGUF 100% GPU 卸载，34 GB 统一内存，13 tok/s</td><td><span class="tag t-ok">已验证</span></td></tr>
+    <tr><td>128 GB 统一内存</td><td>跑 30B 级模型不爆显存，这是消费级显卡做不到的事</td><td><span class="tag t-ok">已验证</span></td></tr>
+    <tr><td>CUDA 13.0.2 SDK</td><td>nvcc 自研并行决策头；cuBLAS 加速</td><td><span class="tag t-ok">已验证可用</span></td></tr>
+    <tr><td>Nsight Systems / Compute</td><td>出系统时间线与 kernel 剖析报告，作为性能优化证据</td><td><span class="tag t-ok">已验证可用</span></td></tr>
+    <tr><td>NVIDIA DGX OS</td><td>系统版本、驱动 580.142 写入文档</td><td><span class="tag t-ok">已验证</span></td></tr>
+    <tr><td>开源模型</td><td>Qwen3 GGUF（ollama / ModelScope 拉取）</td><td><span class="tag t-ok">已验证</span></td></tr>
+    <tr><td>StepFun</td><td>云端最高层终审 + 合成数据 + 报告生成 + 评测裁判</td><td><span class="tag t-ok">可达已验证</span></td></tr>
+    <tr><td>公网端口映射</td><td>8888 / 9000 对外演示，已实测 HTTP 200</td><td><span class="tag t-ok">已验证</span></td></tr>
+    <tr><td>NVIDIA NIM / NGC 容器</td><td>nvcr.io 不可达</td><td><span class="tag t-bad">不可用，勿投入</span></td></tr>
+  </table>
+  <div class="note red">
+    <b>止损提醒：</b>NGC 容器与 Docker Hub 都拉不动，别在这上面浪费哪怕一小时。把精力放在"本地推理 + CUDA + Nsight + StepFun"这条能走通的主线上。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>StepFun 要承担的四件事（否则只是点缀）</h2>
+  <ol>
+    <li><b>难例终审</b>：本地决策层置信度 &lt;0.6 且本地 27B 仍无把握时，升级到 StepFun 做最终判断。</li>
+    <li><b>合成数据与真值标注（关键）</b>：用 StepFun 给历史报警文本打标签、生成手册问答对与 SOP 草稿，构建<b>校准集与训练集</b>——StepFun 成为数据闭环的源头，而非外挂。</li>
+    <li><b>报告生成</b>：决策层只输出结构化判断，给"人"看的自然语言处置报告由 StepFun 生成——正好体现"判断与表达分离"的设计哲学。</li>
+    <li><b>评测裁判</b>：用 StepFun 的判断作为参照，计算本地决策层的<b>与最优模型一致率</b>，复刻 Jev 官方评测口径，形成诚实的能力边界说明。</li>
+  </ol>
+  <div class="note">
+    演示里务必<b>保留 StepFun 调用日志与 token 用量截图</b>——这是 15% 平台适配分里最容易拿、也最容易忘留证据的一项。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">6</span>必须产出的量化指标（25% 实用性的胜负手）</h2>
+  <p>评委给高分的不是"能跑"，是"跑出了对比数字"。以下五张表/曲线必须做出来：</p>
+  <table>
+    <tr><th>指标</th><th>怎么得</th><th>预期说服力</th></tr>
+    <tr><td>延迟对比</td><td>决策层单次 vs 生成式推理（昨日实测 256 token 需 19.7 s）</td><td>目标 50~200 ms 量级，<b>两个数量级差距</b></td></tr>
+    <tr><td>成本对比</td><td>本地 0 元 vs 云端按次计费</td><td>规模化为年度费用，直观</td></tr>
+    <tr><td><b>阈值—自动化率—准确率权衡表</b></td><td>在留出集上扫阈值，输出每档的自动化率与错误率</td><td><b>杀手锏</b>：直击工业客户最关心的"敢不敢自动"</td></tr>
+    <tr><td>校准前后可靠性曲线 + ECE / Brier</td><td>校准集拟合温度缩放，画出校准前后对比</td><td>Jev 都没公开的东西，我们有</td></tr>
+    <tr><td>与 StepFun 一致率 + 混淆矩阵</td><td>同一批评测样本，双方案对照</td><td>诚实披露能力边界，反增可信度</td></tr>
+  </table>
+  <div class="note green">
+    <b>第 3 项是整套方案的核心卖点。</b>「阈值调到 0.9 时，62% 的报警可以自动处置，其中准确率 96.3%，人工复核工作量下降六成」——这种句子评委记得住，而它只有做了校准才说得出口。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>Skills 体系（题眼，必须做扎实）</h2>
+  <table>
+    <tr><th>Skill</th><th>职责</th><th>对应数据 / 技术</th></tr>
+    <tr><td>S1 报警分诊</td><td>System One 决策，输出类型化判断 + 概率</td><td>AI4I 2020 + 校准集</td></tr>
+    <tr><td>S2 手册检索</td><td>RAG，返回处置规程与依据条款</td><td>厂商手册 + 国标 + SOP</td></tr>
+    <tr><td>S3 振动诊断</td><td>基于振动信号的故障分类</td><td>CWRU / XJTU-SY</td></tr>
+    <tr><td>S4 剩余寿命</td><td>RUL 回归预测</td><td>C-MAPSS / PHM 2010</td></tr>
+    <tr><td>S5 工单生成</td><td>结构化工单输出与派单</td><td>自研模板 + StepFun 润色</td></tr>
+    <tr><td>S6 视觉质检（可选）</td><td>表面缺陷检测</td><td>MVTec AD / NEU-DET</td></tr>
+  </table>
+  <ul>
+    <li>每个 Skill 一个独立目录 + <code>SKILL.md</code> 契约文档（输入 / 输出 / 依赖 / 失败模式）</li>
+    <li>支持热插拔，<b>演示时在界面上现场装一个新 Skill</b>——这是"Skills 设计"最直观的证明</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="n">8</span>8 天执行表（9.21 起算）</h2>
+  <div class="day"><div class="d">9.21 D1</div><div class="c"><b>打地基</b>：装 torch / modelscope SDK；拉 AI4I 2020 + 设备手册；跑通 encoder + 决策头原型（先 CPU）</div></div>
+  <div class="day"><div class="d">9.22 D2</div><div class="c"><b>校准管线</b>：构建校准集（StepFun 标注 + 合成）；温度缩放 / 保序回归；出可靠性曲线与 ECE</div></div>
+  <div class="day"><div class="d">9.23–24</div><div class="c"><b>核心系统</b>：三层路由 + 人工复核台 + 工单生成；RAG 知识库灌库；阈值—自动化率权衡表</div></div>
+  <div class="day"><div class="d">9.25</div><div class="c"><b>System Two</b>：多智能体编排；本地 27B 接入；StepFun 云端终审与报告生成打通</div></div>
+  <div class="day"><div class="d">9.26</div><div class="c"><b>工程与调优</b>：Skills 契约化；前端看板；Nsight 剖析；若有余力把决策头写成 CUDA kernel</div></div>
+  <div class="day"><div class="d">9.27</div><div class="c"><b>稳定日</b>：只修 bug；README + 架构图；三条演示用例脚本化；<b>全量备份到节点外</b></div></div>
+  <div class="day"><div class="d">9.28</div><div class="c"><b>拍片日</b>：5 分钟 Demo 视频（含凭据打码）；征文「十日谈」补齐</div></div>
+  <div class="day"><div class="d">9.29</div><div class="c"><b>提交日</b>：上午终检，<b>18:00 前提交</b>，不卡 23:59</div></div>
+</section>
+
+<section>
+  <h2><span class="n">9</span>风险与降级预案</h2>
+  <table>
+    <tr><th>风险</th><th>预案</th></tr>
+    <tr><td>encoder 上不了 GPU</td><td>CPU 小模型 encoder 已足够（20 Arm 核），GPU 加速列为加分项而非必选项</td></tr>
+    <tr><td>StepFun 调用不稳或额度不足</td><td>降级为本地 27B 顶上，保留调用日志即可得分</td></tr>
+    <tr><td>CUDA 决策头写不完</td><td>用 numpy / torch 实现，CUDA 版本作为"优化尝试"记录进征文，不影响主流程</td></tr>
+    <tr><td>时间不够做完全部 6 个 Skill</td><td>保 S1/S2/S5 三个核心 + 契约文档完整，S3/S4/S6 按需裁剪</td></tr>
+    <tr><td>节点再次不可用</td><td>每日备份到节点外；关键素材本地留双份</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="n">10</span>提交前评分自检（逐项打勾）</h2>
+  <table>
+    <tr><td>☐</td><td>阈值—自动化率—准确率权衡表已生成并写进文档</td></tr>
+    <tr><td>☐</td><td>校准前后可靠性曲线 + ECE / Brier 数值</td></tr>
+    <tr><td>☐</td><td>延迟与成本对比（本地 vs 云端）</td></tr>
+    <tr><td>☐</td><td>StepFun 调用日志与 token 用量截图</td></tr>
+    <tr><td>☐</td><td>nvidia-smi 本地推理证据 + Nsight 剖析报告</td></tr>
+    <tr><td>☐</td><td>6 个 Skill 契约文档齐全，演示中现场装过新 Skill</td></tr>
+    <tr><td>☐</td><td>三条演示用例在干净环境从头跑通</td></tr>
+    <tr><td>☐</td><td>Demo 视频 ≤5 分钟，凭据已打码</td></tr>
+    <tr><td>☐</td><td>征文「十日谈」10 篇齐</td></tr>
+    <tr><td>☐</td><td>所有材料在节点外有双备份</td></tr>
+  </table>
+</section>
+
+<footer>
+  方案 v2 由 WorkBuddy 生成 · 全部技术判断基于 gx10-902c 节点 2026-09-20/21 两轮实测<br>
+  关键取舍：放弃 ollama logprobs 路线，改为自建 encoder + 可校准决策头，更贴合 System One 原始思想
+</footer>
+
+</div>
+</body>
+</html>

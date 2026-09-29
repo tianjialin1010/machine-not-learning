@@ -1,0 +1,8 @@
+{
+  "status": "deployed",
+  "release": "/home/USER/sentinel-stack/frontend-releases/pc-ui-20260929-1115",
+  "backup": "/home/USER/sentinel-stack/deployment-backups/pc-ui-20260929-1115",
+  "pid": 3270430,
+  "decision_head": "sentinel-mlp@cuda",
+  "protected_artifacts_unchanged": true
+}

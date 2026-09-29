@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>哨兵 EdgeSentinel · 工业决策台（jev 框架原生契约）</title>
+<style>
+  :root{
+    --bg:#0b1017; --panel:#121a24; --panel2:#0e151d; --line:#1f2c3a;
+    --fg:#e6edf5; --dim:#8fa3b8; --dim2:#5d7191;
+    --auto:#3fb950; --review:#d29922; --danger:#f85149; --info:#58a6ff; --evi:#a371f7;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:13px/1.55 -apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  header{padding:14px 20px;border-bottom:1px solid var(--line);
+         display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+         background:linear-gradient(180deg,#101a25,#0b1017)}
+  h1{font-size:16px;margin:0;font-weight:600;letter-spacing:.3px}
+  h1 span{color:var(--auto)}
+  .sub{color:var(--dim);font-size:12px}
+  .wrap{padding:16px 20px;display:grid;gap:16px;
+        grid-template-columns:minmax(0,1.45fr) minmax(0,1fr)}
+  @media(max-width:1080px){.wrap{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+        overflow:hidden}
+  .card>h2{margin:0;padding:10px 14px;font-size:12.5px;font-weight:600;
+           letter-spacing:.4px;color:var(--dim);background:var(--panel2);
+           border-bottom:1px solid var(--line);display:flex;justify-content:space-between;
+           align-items:center;gap:10px}
+  .card .body{padding:12px 14px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  @media(max-width:620px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:9px 11px}
+  .kpi b{display:block;font-size:19px;line-height:1.25;letter-spacing:.3px}
+  .kpi i{font-style:normal;color:var(--dim2);font-size:11px}
+  .strip{display:flex;gap:8px;flex-wrap:wrap;padding:0 20px 0}
+  .tag{border:1px solid var(--line);background:var(--panel2);border-radius:999px;
+       padding:3px 10px;font-size:11.5px;color:var(--dim)}
+  .tag b{color:var(--fg);font-weight:600}
+  .feed{max-height:46vh;overflow:auto}
+  .row{display:grid;grid-template-columns:74px 1fr auto;gap:10px;align-items:center;
+       padding:8px 14px;border-bottom:1px solid #16202c}
+  .row:last-child{border-bottom:none}
+  .row .id{color:var(--dim);font-size:11.5px}
+  .row .meta{color:var(--dim);font-size:11.5px;margin-top:2px}
+  .badge{border-radius:6px;padding:3px 9px;font-size:11.5px;font-weight:600;
+         white-space:nowrap}
+  .s-auto{background:rgba(63,185,80,.14);color:var(--auto);border:1px solid rgba(63,185,80,.35)}
+  .s-norm{background:rgba(88,166,255,.13);color:var(--info);border:1px solid rgba(88,166,255,.32)}
+  .s-rev {background:rgba(210,153,34,.15);color:var(--review);border:1px solid rgba(210,153,34,.36)}
+  .s-evi {background:rgba(163,113,247,.14);color:var(--evi);border:1px solid rgba(163,113,247,.34)}
+  .s-bad {background:rgba(248,81,73,.15);color:var(--danger);border:1px solid rgba(248,81,73,.38)}
+  .bar{height:5px;border-radius:3px;background:#1b2532;overflow:hidden;margin-top:5px}
+  .bar>i{display:block;height:100%}
+  button{background:#1b2532;color:var(--fg);border:1px solid #2b3a4b;border-radius:7px;
+         padding:6px 12px;font-size:12px;cursor:pointer}
+  button:hover{border-color:#3d5168}
+  button.pri{background:rgba(63,185,80,.16);border-color:rgba(63,185,80,.45);color:var(--auto)}
+  .queue{max-height:32vh;overflow:auto}
+  .q{border-bottom:1px solid #16202c;padding:8px 14px}
+  .q:last-child{border-bottom:none}
+  .q b{font-weight:600}
+  .q .why{color:var(--dim2);font-size:11px}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{text-align:left;padding:5px 4px;border-bottom:1px solid #16202c}
+  th{color:var(--dim2);font-weight:500;font-size:11px}
+  td.n{text-align:right;font-variant-numeric:tabular-nums}
+  .hl{color:var(--auto)}
+  .warn{color:var(--review)}
+  details{margin-top:8px}
+  summary{cursor:pointer;color:var(--dim);font-size:12px}
+  pre{background:var(--panel2);border:1px solid var(--line);border-radius:8px;
+      padding:10px;overflow:auto;max-height:34vh;font-size:11.5px;color:#c9d6e4}
+  .foot{color:var(--dim2);font-size:11.5px;padding:0 20px 22px}
+</style>
+</head>
+<body>
+<header>
+  <h1>哨兵 <span>EdgeSentinel</span></h1>
+  <div class="sub">工业报警智能处置中枢 · 决策层跑在 jev-decision-service 框架上</div>
+</header>
+
+<div class="strip" id="strip" style="padding-top:12px"></div>
+
+<div class="wrap">
+  <div style="display:grid;gap:16px;align-content:start">
+    <div class="card">
+      <h2>实时报警流
+        <span>
+          <button id="btn-stream" class="pri">开始</button>
+          <button id="btn-batch">跑真实留出集</button>
+        </span>
+      </h2>
+      <div class="body" style="padding:0">
+        <div class="row" style="border-bottom:1px solid var(--line);color:var(--dim2);font-size:11px">
+          <span>设备</span>
+          <span>决策（Noul 是否故障 · Choice 故障类型 · Score 优先级）</span>
+          <span>路由</span>
+        </div>
+        <div class="feed" id="feed"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>真实留出集评测（AI4I · 训练未见 20%）</h2>
+      <div class="body" id="eval-body">
+        <div class="sub">点「跑真实留出集」按钮，直接在服务端跑留出集样本。</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;gap:16px;align-content:start">
+    <div class="card">
+      <h2>本次会话统计</h2>
+      <div class="body">
+        <div class="kpis">
+          <div class="kpi"><i>自动化率</i><b id="k-auto">—</b></div>
+          <div class="kpi"><i>样本数</i><b id="k-n">0</b></div>
+          <div class="kpi"><i>平均端到端</i><b id="k-lat">—</b></div>
+          <div class="kpi"><i>路由动作种类</i><b id="k-kinds">0</b></div>
+        </div>
+        <table style="margin-top:10px"><tbody id="k-dist"></tbody></table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>人工复核队列</h2>
+      <div class="queue" id="queue"><div class="q sub">（空）</div></div>
+    </div>
+
+    <div class="card">
+      <h2>最近一次原始响应</h2>
+      <div class="body">
+        <details open><summary>jev /v1/decide 原生字段</summary>
+          <pre id="raw">—</pre>
+        </details>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  响应字段完全沿用 jev 的契约：<span class="mono">recommended_action.kind / route / route_reason /
+  warnings / calibration_profile / decisions[].calibration_status</span>。
+  决策头只提供概率分布，校准策略、分布漂移、OOD、稀有类保护与最终路由均由框架负责。
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const ACTION_CN = {
+  answer_from_context:"判正常·归档", draft_suggestion:"自动开工单",
+  human_review:"转人工复核", retrieve_evidence:"先查手册/工单",
+  ask_clarification:"追问确认", abstain:"弃权", stop:"停止"
+};
+const CLASS_OF = {
+  answer_from_context:"s-norm", draft_suggestion:"s-auto",
+  human_review:"s-rev", retrieve_evidence:"s-evi",
+  ask_clarification:"s-rev", abstain:"s-bad", stop:"s-bad"
+};
+let stats = {}, latSum = 0, n = 0, q = [], timer = null;
+
+// ---------------------------------------------------------------- 传感器仿真
+function sensor(){
+  const air = +(21.5 + Math.random()*4).toFixed(1);
+  const bad = Math.random() < 0.22;               // 约 22% 注入异常工况
+  const diff = bad ? +(12.4 + Math.random()*3).toFixed(1)
+                   : +(8.2 + Math.random()*2.6).toFixed(1);
+  return {
+    air_temp_c: air,
+    process_temp_c: +(air + diff).toFixed(1),
+    rpm: Math.round(bad ? 1250 + Math.random()*350 : 1450 + Math.random()*520),
+    torque_nm: +(bad ? 50 + Math.random()*22 : 28 + Math.random()*22).toFixed(1),
+    tool_wear_min: +(bad ? 185 + Math.random()*68 : Math.random()*150).toFixed(0)
+  };
+}
+
+// ---------------------------------------------------------------- 请求
+async function decide(devId, features, extra){
+  const body = {
+    conversation_id: "ui-" + devId + "-" + Date.now() + "-" + Math.random().toString(36).slice(2,7),
+    current_message: "设备状态上报",
+    conversation_state: Object.assign({ structured_features: features }, extra || {})
+  };
+  const t0 = performance.now();
+  const res = await fetch("/v1/decide", {
+    method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify(body)
+  });
+  const json = await res.json();
+  return { json, ms: performance.now() - t0 };
+}
+
+// ---------------------------------------------------------------- 渲染
+function actionOf(j){ return (j.recommended_action || {}).kind || "?"; }
+function badge(kind){ return '<span class="badge ' + (CLASS_OF[kind]||"s-rev") + '">'
+  + (ACTION_CN[kind] || kind) + '</span>'; }
+
+function render(devId, j, ms){
+  const d = Object.fromEntries((j.decisions||[]).map(x => [x.id, x]));
+  const noul = d.fault, ft = d.fault_type, rl = d.risk_level;
+  const kind = actionOf(j);
+  const p = noul ? noul.probabilities.yes : null;
+  const cls = kind === "answer_from_context" ? "s-norm"
+            : kind === "draft_suggestion"  ? "s-auto"
+            : kind === "retrieve_evidence" ? "s-evi" : "s-rev";
+  const route = j.route === "generative" ? "生成式" : "决策头";
+  const warn = (j.warnings||[]).length ? ' · <span class="warn">⚠ ' + (j.warnings||[]).join(",") + '</span>' : "";
+  const el = document.createElement("div");
+  el.className = "row";
+  el.innerHTML =
+    '<span class="id mono">' + devId + '</span>' +
+    '<span>' +
+      '<span class="mono">p(故障)=' + (p==null?"—":p.toFixed(4)) + '</span> · ' +
+      '<b>' + (ft ? ft.value : "—") + '</b> · ' +
+      '优先级 <b>' + (rl ? rl.value.toFixed(2) : "—") + '</b>' +
+      '<div class="bar"><i style="width:' + ((p||0)*100).toFixed(1)
+        + '%;background:' + (p>0.5?"var(--danger)":"var(--auto)") + '"></i></div>' +
+      '<div class="meta">' + route + ' · ' + ms.toFixed(1) + ' ms · ' +
+        (j.trace_id||"").slice(0,14) + warn + '</div>' +
+    '</span>' +
+    '<span>' + badge(kind) + '</span>';
+  const feed = $("feed");
+  feed.insertBefore(el, feed.firstChild);
+  while (feed.children.length > 60) feed.removeChild(feed.lastChild);
+
+  stats[kind] = (stats[kind]||0)+1; latSum += ms; n++;
+  $("k-auto").textContent = (((stats.draft_suggestion||0)+(stats.answer_from_context||0))/n*100).toFixed(1)+"%";
+  $("k-n").textContent = n;
+  $("k-lat").textContent = (latSum/n).toFixed(1)+" ms";
+  $("k-kinds").textContent = Object.keys(stats).length;
+  $("k-dist").innerHTML = Object.entries(stats).sort((a,b)=>b[1]-a[1]).map(([k,v])=>
+    '<tr><td>'+badge(k)+'</td><td class="n mono">'+v+'</td><td class="n">'
+    + (v/n*100).toFixed(1)+'%</td></tr>').join("");
+
+  if (kind === "human_review" || kind === "abstain"){
+    q.unshift({dev:devId, p:p, sev: rl?rl.value:null, why:(j.recommended_action||{}).reason_codes||[]});
+    q = q.slice(0,40);
+    $("queue").innerHTML = q.map(x =>
+      '<div class="q"><b class="mono">'+x.dev+'</b> p='+(x.p==null?"—":x.p.toFixed(4))
+      +' 优先级='+(x.sev==null?"—":x.sev.toFixed(2))
+      +'<div class="why">'+x.why.join(", ")+'</div></div>').join("");
+  }
+  $("raw").textContent = JSON.stringify(j, null, 2);
+}
+
+// ---------------------------------------------------------------- 交互
+$("btn-stream").onclick = () => {
+  if (timer){ clearInterval(timer); timer = null; $("btn-stream").textContent = "开始"; return; }
+  $("btn-stream").textContent = "暂停";
+  timer = setInterval(async () => {
+    const f = sensor(), dev = "CMP-" + String(Math.floor(Math.random()*900)+100);
+    try { const r = await decide(dev, f); render(dev, r.json, r.ms); }
+    catch(e){ console.warn(e); }
+  }, 700);
+};
+
+$("btn-batch").onclick = async () => {
+  const box = $("eval-body");
+  box.innerHTML = '<div class="sub">正在跑留出集（服务端执行，约数秒）…</div>';
+  try {
+    const r = await fetch("/v1/eval/dataset?n=1000&seed=7");
+    const d = await r.json();
+    if (d.error){ box.innerHTML = '<div class="sub warn">'+d.error+'</div>'; return; }
+    const pct = v => v==null ? "—" : (v*100).toFixed(1)+"%";
+    box.innerHTML =
+      '<table><tbody>' +
+      '<tr><th>样本数</th><td class="n mono">'+d.n+'</td>'
+        + '<th>自动化率</th><td class="n mono hl">'+pct(d.automation_rate)+'</td></tr>' +
+      '<tr><th>自动部分准确率</th><td class="n mono hl">'+pct(d.auto_precision)+'</td>'
+        + '<th>需人工/查证</th><td class="n mono">'+d.review_count+'</td></tr>' +
+      '<tr><th>故障样本</th><td class="n mono">'+d.fault_total+'</td>'
+        + '<th>故障漏放率</th><td class="n mono '+(d.fault_miss_rate>0.1?"warn":"hl")+'">'
+        + pct(d.fault_miss_rate)+'</td></tr>' +
+      '<tr><th>正常设备误转率</th><td class="n mono">'+pct(d.normal_false_review_rate)+'</td>'
+        + '<th>单条引擎耗时</th><td class="n mono">'+d.latency_per_item_ms.toFixed(4)+' ms</td></tr>' +
+      '<tr><th>吞吐（纯引擎）</th><td class="n mono">'
+        + Math.round(d.throughput_per_s).toLocaleString()+' 条/秒</td>'
+        + '<th>p95 引擎耗时</th><td class="n mono">'+d.latency_p95_engine_ms+' ms</td></tr>' +
+      '</tbody></table>' +
+      '<table style="margin-top:10px"><thead><tr><th>路由动作</th><th class="n">条数</th></tr></thead><tbody>'
+      + Object.entries(d.actions).sort((a,b)=>b[1]-a[1]).map(([k,v])=>
+        '<tr><td>'+badge(k)+'</td><td class="n mono">'+v+'</td></tr>').join("")
+      + '</tbody></table>';
+  } catch(e){ box.innerHTML = '<div class="sub warn">请求失败：'+e+'</div>'; }
+};
+
+// ---------------------------------------------------------------- 启动
+(async () => {
+  try {
+    const h = await (await fetch("/healthz")).json();
+    $("strip").innerHTML =
+      '<span class="tag">框架 <b>'+h.framework+'</b></span>' +
+      '<span class="tag">决策头 <b>'+h.decision_head+'</b></span>' +
+      '<span class="tag">torch <b>'+h.torch+'</b></span>' +
+      '<span class="tag">温度 T：' +
+        Object.entries(h.temperatures||{}).map(([k,v])=>k+'='+v).join(" / ") + '</span>' +
+      '<span class="tag">升级生成式 <b>'+(h.escalate?"开":"关")+'</b></span>' +
+      '<span class="tag">训练耗时 <b>'+h.train_seconds+'s</b>'+(h.cache_hit?"（缓存）":"")+'</span>';
+  } catch(e){ $("strip").innerHTML = '<span class="tag warn">健康检查失败</span>'; }
+})();
+</script>
+</body>
+</html>

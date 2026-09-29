@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "scenario": "steel",
+  "model_version": "steel-mlp64x32-20260929T035632Z",
+  "created_at": "2026-09-29T03:56:32.813321+00:00",
+  "model_architecture": {
+    "hidden": [
+      64,
+      32
+    ],
+    "activation": "ReLU",
+    "input_dim": 27,
+    "output_dim": 7
+  },
+  "raw_feature_names": [
+    "X_Minimum",
+    "X_Maximum",
+    "Y_Minimum",
+    "Y_Maximum",
+    "Pixels_Areas",
+    "X_Perimeter",
+    "Y_Perimeter",
+    "Sum_of_Luminosity",
+    "Minimum_of_Luminosity",
+    "Maximum_of_Luminosity",
+    "Length_of_Conveyer",
+    "TypeOfSteel_A300",
+    "TypeOfSteel_A400",
+    "Steel_Plate_Thickness",
+    "Edges_Index",
+    "Empty_Index",
+    "Square_Index",
+    "Outside_X_Index",
+    "Edges_X_Index",
+    "Edges_Y_Index",
+    "Outside_Global_Index",
+    "LogOfAreas",
+    "Log_X_Index",
+    "Log_Y_Index",
+    "Orientation_Index",
+    "Luminosity_Index",
+    "SigmoidOfAreas"
+  ],
+  "feature_units": {},
+  "classes": [
+    "Pastry",
+    "Z_Scratch",
+    "K_Scatch",
+    "Stains",
+    "Dirtiness",
+    "Bumps",
+    "Other_Faults"
+  ],
+  "normal_class": null,
+  "temperature": 1.299691039029031,
+  "calibrated": true,
+  "calibration": {
+    "method": "scalar_temperature_grid",
+    "fit_partition": "calibration",
+    "n": 388,
+    "nll_before": 0.7245371802931196,
+    "nll_after": 0.7054324208151532,
+    "search_bounds": [
+      0.05,
+      20
+    ]
+  },
+  "imputer_medians": [
+    419.0,
+    457.0,
+    1251477.5,
+    1251493.0,
+    172.0,
+    27.0,
+    25.0,
+    19500.5,
+    90.0,
+    127.0,
+    1364.0,
+    0.0,
+    1.0,
+    70.0,
+    0.2241,
+    0.4167,
+    0.55365,
+    0.0103,
+    0.6364,
+    0.9444,
+    1.0,
+    2.2355,
+    1.1761,
+    1.3222,
+    0.09905,
+    -0.1316,
+    0.5212
+  ],
+  "selected_feature_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26
+  ],
+  "scaler_mean": [
+    566.5343642611684,
+    613.8341924398626,
+    1671977.2225085911,
+    1672037.8840206186,
+    1985.664089347079,
+    117.88659793814433,
+    90.42439862542955,
+    214611.90721649484,
+    84.43900343642612,
+    130.56443298969072,
+    1453.4785223367699,
+    0.4054982817869416,
+    0.5945017182130584,
+    79.30756013745705,
+    0.33363144329896904,
+    0.4150378006872852,
+    0.5663526632302406,
+    0.033749398625429555,
+    0.608763058419244,
+    0.8093462199312714,
+    0.5721649484536082,
+    2.4976799828178695,
+    1.3404948453608245,
+    1.4044474226804124,
+    0.08097594501718212,
+    -0.13174570446735392,
+    0.5896115979381443
+  ],
+  "scaler_scale": [
+    518.8507833828872,
+    496.6064278252322,
+    1766209.0076793546,
+    1766230.471673316,
+    5893.202140936097,
+    359.2625979527213,
+    542.4873067283769,
+    558677.9997423763,
+    32.52673588696642,
+    19.60223371462798,
+    142.06270838116927,
+    0.49098821294892586,
+    0.49098821294892586,
+    55.74675720979558,
+    0.3015255496420168,
+    0.13785242905563033,
+    0.2699330170535949,
+    0.05862186655566303,
+    0.24277659588224698,
+    0.23779606154084323,
+    0.48512065343930905,
+    0.7959889134571756,
+    0.48346906125055,
+    0.46247319833392103,
+    0.5043390247426849,
+    0.15234716314158012,
+    0.3391733111975617
+  ],
+  "dataset": {
+    "name": "Steel Plates Faults",
+    "source": "local dataset files from ind_ds",
+    "split": {
+      "strategy": "stratified_record_split_60_20_20",
+      "limitation": "No plate/production-batch identifiers supplied; independent-batch generalization is unverified.",
+      "counts": {
+        "train": 1164,
+        "calibration": 388,
+        "test": 389
+      },
+      "class_support": {
+        "train": {
+          "Pastry": 95,
+          "Z_Scratch": 114,
+          "K_Scatch": 234,
+          "Stains": 43,
+          "Dirtiness": 33,
+          "Bumps": 241,
+          "Other_Faults": 404
+        },
+        "calibration": {
+          "Pastry": 32,
+          "Z_Scratch": 38,
+          "K_Scatch": 78,
+          "Stains": 15,
+          "Dirtiness": 11,
+          "Bumps": 80,
+          "Other_Faults": 134
+        },
+        "test": {
+          "Pastry": 31,
+          "Z_Scratch": 38,
+          "K_Scatch": 79,
+          "Stains": 14,
+          "Dirtiness": 11,
+          "Bumps": 81,
+          "Other_Faults": 135
+        }
+      },
+      "row_id_sha256": {
+        "train": "2ed3378517c21db331c6d7b0487d19487ce540ad107291c85b501fa16c102d95",
+        "calibration": "723889d816bcb665a87a35b953bdb2dc16374ee34a872aa615431b2729db97a3",
+        "test": "34b1688f6bde24b68eecab793d153bb17647ef98485ba3684d9f3d2aa0b8313c"
+      }
+    },
+    "source_sha256": {
+      "Faults.NNA": "08994f5b0185a8e6cc22afe9910fd36834990fb1ca30852ed79012a832fbff55"
+    }
+  },
+  "training": {
+    "seed": 20260929,
+    "epochs": 300,
+    "optimizer": "Adam",
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "class_weights": [
+      1.7503759398496241,
+      1.4586466165413534,
+      0.7106227106227107,
+      3.867109634551495,
+      5.038961038961039,
+      0.6899822169531713,
+      0.4115983026874116
+    ],
+    "device": "cuda",
+    "preprocessing_fit_partition": "train",
+    "early_stopping": false,
+    "elapsed_seconds": 0.465
+  },
+  "metrics": {
+    "n": 389,
+    "accuracy": 0.7172236503856041,
+    "balanced_accuracy": 0.8125859745761889,
+    "macro_f1": 0.7272212074550213,
+    "top_label_ece": 0.02827110774209754,
+    "multiclass_brier": 0.36881606847162,
+    "confusion_matrix": [
+      [
+        24,
+        0,
+        0,
+        0,
+        2,
+        3,
+        2
+      ],
+      [
+        0,
+        33,
+        1,
+        0,
+        0,
+        3,
+        1
+      ],
+      [
+        1,
+        0,
+        73,
+        0,
+        0,
+        1,
+        4
+      ],
+      [
+        0,
+        0,
+        0,
+        14,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        10,
+        0,
+        1
+      ],
+      [
+        3,
+        3,
+        1,
+        3,
+        2,
+        58,
+        11
+      ],
+      [
+        20,
+        4,
+        3,
+        4,
+        6,
+        31,
+        67
+      ]
+    ],
+    "class_support": {
+      "Pastry": 31,
+      "Z_Scratch": 38,
+      "K_Scatch": 79,
+      "Stains": 14,
+      "Dirtiness": 11,
+      "Bumps": 81,
+      "Other_Faults": 135
+    }
+  },
+  "display_features": [
+    {
+      "key": "Pixels_Areas",
+      "label": "Pixels_Areas",
+      "unit": null,
+      "kind": "model_feature"
+    },
+    {
+      "key": "Steel_Plate_Thickness",
+      "label": "Steel_Plate_Thickness",
+      "unit": null,
+      "kind": "model_feature"
+    },
+    {
+      "key": "Luminosity_Index",
+      "label": "Luminosity_Index",
+      "unit": null,
+      "kind": "model_feature"
+    },
+    {
+      "key": "Edges_Index",
+      "label": "Edges_Index",
+      "unit": null,
+      "kind": "model_feature"
+    }
+  ],
+  "limitations": [
+    "Research dataset inference; not connected to physical sensors.",
+    "Calibration fitted on a reserved partition; this is not production safety validation.",
+    "No plate/production-batch identifiers supplied; independent-batch generalization is unverified."
+  ],
+  "model_sha256": "60464a4a7f2295977d69bcbfc1039a8e77749b64ca567d4bd47fad25eca77ba8"
+}

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DGX Spark 云节点性能测评报告 · gx10-902c</title>
+<style>
+  :root{
+    --ink:#1F2328; --ink2:#4B5563; --ink3:#6B7280;
+    --line:#E5E7EB; --bg:#FFFFFF; --soft:#F7F8FA;
+    --nv:#76B900; --nv-dark:#5A8F00; --nv-bg:#F4FAE8;
+    --red:#C62828; --red-bg:#FEF2F2; --red-line:#FBD5D5;
+    --amber:#B26A00; --amber-bg:#FFFBEB; --amber-line:#FDE9C0;
+    --green:#1B7F3B; --green-bg:#F0FDF4; --green-line:#C7EDD4;
+    --blue:#1D4ED8; --blue-bg:#EFF6FF; --blue-line:#C7DBFB;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;padding:0;background:var(--soft);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1000px;margin:0 auto;padding:40px 24px 90px;}
+  header{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:34px 36px 30px;margin-bottom:20px;position:relative;overflow:hidden;}
+  header::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--nv);}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--nv-dark);font-weight:700;margin-bottom:10px;}
+  h1{margin:0 0 8px;font-size:27px;line-height:1.35;letter-spacing:-.01em;}
+  .sub{color:var(--ink3);font-size:14px;}
+  .hero{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:26px;}
+  .hero .m{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:14px 16px;}
+  .hero .m .v{font-size:23px;font-weight:700;color:var(--nv-dark);letter-spacing:-.02em;line-height:1.2;}
+  .hero .m .k{font-size:12px;color:var(--ink3);margin-top:4px;}
+  .verdict{margin-top:22px;background:var(--green-bg);border:1px solid var(--green-line);border-left:4px solid var(--green);border-radius:10px;padding:16px 20px;}
+  .verdict b{color:var(--green);}
+  .verdict p{margin:6px 0 0;color:var(--ink2);font-size:14px;}
+  section{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:28px 32px;margin-bottom:18px;}
+  h2{font-size:17px;margin:0 0 18px;padding-bottom:12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;}
+  h2 .n{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:var(--nv);color:#fff;font-size:13px;font-weight:700;flex:none;}
+  h3{font-size:14px;margin:24px 0 10px;color:var(--ink2);font-weight:700;}
+  h3:first-of-type{margin-top:6px;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:14px 0;}
+  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{background:var(--soft);font-weight:700;font-size:12.5px;color:var(--ink2);white-space:nowrap;}
+  td.mono,th.mono,td b.mono{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;font-size:12.5px;}
+  tr:last-child td{border-bottom:none;}
+  .tag{display:inline-block;padding:1px 8px;border-radius:5px;font-size:12px;font-weight:700;white-space:nowrap;}
+  .t-ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-line);}
+  .t-bad{background:var(--red-bg);color:var(--red);border:1px solid var(--red-line);}
+  .t-warn{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-line);}
+  .t-info{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-line);}
+  pre{background:#F6F8FA;border:1px solid var(--line);border-radius:9px;padding:14px 16px;overflow-x:auto;font-size:12.5px;line-height:1.65;
+    font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;color:#24292F;margin:12px 0;}
+  code{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;font-size:.92em;background:#F1F3F5;padding:1.5px 5px;border-radius:4px;}
+  pre code{background:none;padding:0;}
+  .note{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:4px solid #E0A040;border-radius:9px;padding:14px 18px;font-size:13.5px;color:var(--ink2);margin:16px 0;}
+  .note.green{background:var(--green-bg);border-color:var(--green-line);border-left-color:var(--green);}
+  .note.red{background:var(--red-bg);border-color:var(--red-line);border-left-color:var(--red);}
+  .note.blue{background:var(--blue-bg);border-color:var(--blue-line);border-left-color:var(--blue);}
+  .note b{color:var(--ink);}
+  ul,ol{margin:10px 0;padding-left:22px;}
+  li{margin-bottom:7px;}
+  .bar{height:8px;background:#EEF1F4;border-radius:5px;overflow:hidden;margin-top:5px;}
+  .bar i{display:block;height:100%;background:var(--nv);border-radius:5px;}
+  .bar.warn i{background:#E8A33D;}
+  .bar.bad i{background:#D9534F;}
+  .score{display:grid;grid-template-columns:170px 1fr 52px;gap:10px 14px;align-items:center;font-size:13.5px;margin:16px 0;}
+  .score .lab{color:var(--ink2);}
+  .score .num{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;}
+  footer{text-align:center;color:var(--ink3);font-size:12.5px;padding-top:14px;}
+  @media (max-width:760px){.hero{grid-template-columns:repeat(2,1fr);} .wrap{padding:20px 14px 60px;} section{padding:22px 18px;} header{padding:26px 20px;} .score{grid-template-columns:110px 1fr 44px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">NVIDIA DGX Spark 黑客松 · 节点性能测评</div>
+  <h1>gx10-902c 性能实测报告</h1>
+  <div class="sub">队伍 Machine not Learning &nbsp;·&nbsp; 序号 64 &nbsp;·&nbsp; 公网 CHANGE_ME_NODE_HOST:6014 &nbsp;·&nbsp; 实测时间 2026-09-20 14:54–15:12（北京时间）</div>
+
+  <div class="hero">
+    <div class="m"><div class="v">20 核</div><div class="k">Arm · 10×X925 + 10×A725</div></div>
+    <div class="m"><div class="v">121 GiB</div><div class="k">统一内存可用</div></div>
+    <div class="m"><div class="v">13.0</div><div class="k">tokens/s · 27B 模型</div></div>
+    <div class="m"><div class="v">5.8 GB/s</div><div class="k">NVMe 顺序读</div></div>
+  </div>
+
+  <div class="verdict">
+    <b>总评：硬件是真好，网络是真坑。</b>
+    <p>这台机器<b>算力和内存几乎无短板</b>——GB10 把 27B 量化模型 100% 塞进 GPU（34 GB 统一内存占用），跑出 13.0 tokens/s，反推有效显存带宽约 <b>221 GB/s，达到 273 GB/s 理论峰值的 81%</b>，属于该架构的满血表现。磁盘 4.6/5.8 GB/s 也是第一梯队。<br>
+    唯一的硬伤是<b>国际出网被墙得很彻底</b>：<code>pypi.org</code>、<code>download.pytorch.org</code>、<code>nvcr.io</code>（NVIDIA NGC）、<code>registry-1.docker.io</code>（Docker Hub）<b>四个全部不可达</b>。这意味着手册里推荐的「用 NGC 容器省环境折腾」这条路<b>在这台机器上根本走不通</b>，必须改用国内镜像源。这个坑不提前踩，第一天就得卡住。</p>
+  </div>
+</header>
+
+<section>
+  <h2><span class="n">1</span>硬件规格（实测确认）</h2>
+  <table>
+    <tr><th>项目</th><th>实测值</th><th>对照官方规格</th></tr>
+    <tr><td>主机名 / 用户</td><td class="mono">gx10-902c / USER</td><td>—</td></tr>
+    <tr><td>操作系统</td><td class="mono">Ubuntu 24.04.4 LTS（NVIDIA DGX OS）</td><td>DGX OS ✓</td></tr>
+    <tr><td>内核</td><td class="mono">6.17.0-1014-nvidia · aarch64</td><td>—</td></tr>
+    <tr><td>开机时长</td><td class="mono">18 天 22 小时（负载 0.03，很干净）</td><td>—</td></tr>
+    <tr><td>CPU</td><td class="mono">20 核 Arm：10× Cortex-X925 + 10× Cortex-A725<br>最高 3.9 GHz · 无超线程 · 单 NUMA · L3 24 MiB</td><td>20-core Arm ✓</td></tr>
+    <tr><td>CPU 指令集</td><td class="mono">sve2 · svebf16 · i8mm · bf16 · aes · sha3 · sm3/sm4</td><td>AI / 加密加速齐全</td></tr>
+    <tr><td>内存</td><td class="mono">121 GiB 可用（MemTotal 127.5 GB）+ 16 GB Swap</td><td>128 GB 统一内存 ✓</td></tr>
+    <tr><td>GPU</td><td class="mono">NVIDIA GB10 · 驱动 580.142 · CUDA 13.0</td><td>Grace Blackwell ✓</td></tr>
+    <tr><td>磁盘</td><td class="mono">NVMe ESL01TBTLCZ-27J2-TYN · 931.5 GB<br>ext4 · 916 G，已用 101 G（12%），可用 769 G</td><td>本机是 <b>1 TB 版本</b>（非 4 TB）</td></tr>
+    <tr><td>GPU-NUMA 亲和</td><td class="mono">GPU0 → CPU 0-19（单 NUMA 节点，无跨节点开销）</td><td>—</td></tr>
+  </table>
+  <div class="note blue">
+    <b>一个容易踩的坑：系统时区是 UTC。</b>节点上 <code>date</code> 显示 <code>Sun Sep 20 06:54 UTC</code>，而北京时间是 14:54。<br>
+    <b>系统当前无任何预装服务</b>（除 ollama），Docker 里也没有任何镜像，8888/9000 端口是空的——完全干净，按手册说的自己起。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>性能实测数据</h2>
+
+  <h3>2.1 AI 推理 —— 最关键的一项</h3>
+  <p>节点上已预装 <code>ollama 0.33.2</code> 和模型 <code>Qwen3.8-27B-GGUF</code>（17 GB 权重），直接实测：</p>
+  <table>
+    <tr><th>指标</th><th>实测</th><th>评价</th></tr>
+    <tr><td>模型加载后处理器</td><td class="mono">100% GPU</td><td><span class="tag t-ok">GPU 全卸载</span></td></tr>
+    <tr><td>显存 / 统一内存占用</td><td class="mono">34 GB（权重 + 262144 上下文 KV）</td><td><span class="tag t-ok">充沛</span></td></tr>
+    <tr><td><b>生成速度</b></td><td class="mono"><b>13.0 tokens/s</b>（256 token / 19.72 s）</td><td><span class="tag t-ok">满血</span></td></tr>
+    <tr><td>预填速度（prompt eval）</td><td class="mono">99.4 tokens/s（35 token / 0.35 s）</td><td><span class="tag t-ok">正常</span></td></tr>
+    <tr><td>推理时 GPU 利用率</td><td class="mono">96%</td><td><span class="tag t-ok">打满</span></td></tr>
+    <tr><td>推理时温度 / 功耗</td><td class="mono">47 °C / 44 W</td><td><span class="tag t-ok">凉快、余量巨大</span></td></tr>
+    <tr><td>端到端总耗时</td><td class="mono">20.16 s</td><td>—</td></tr>
+  </table>
+  <div class="note green">
+    <b>13 tokens/s 是好还是差？算一下就知道了。</b><br>
+    17 GB 的模型每生成 1 个 token 都要把全部权重过一遍，所以理论上限 = 内存带宽 ÷ 模型体积 = <b>273 GB/s ÷ 17 GB ≈ 16.1 tokens/s</b>。<br>
+    实测 13.0 tokens/s → 有效带宽 <b>13.0 × 17 GB ≈ 221 GB/s，达成率 81%</b>。<br>
+    <b>结论：这不是「慢」，是接近这块芯片的物理天花板。</b>想更快只有一个办法——换更小的模型（用 7B/8B 轻松上 40+ tokens/s）。
+  </div>
+
+  <h3>2.2 磁盘 IO</h3>
+  <table>
+    <tr><th>项目</th><th>实测</th><th>评价</th></tr>
+    <tr><td>顺序写（1 GiB，O_DIRECT）</td><td class="mono">4.6 GB/s</td><td><span class="tag t-ok">优秀</span></td></tr>
+    <tr><td>顺序读（1 GiB，O_DIRECT）</td><td class="mono">5.8 GB/s</td><td><span class="tag t-ok">优秀</span></td></tr>
+  </table>
+  <p>模型权重、数据集加载不会是瓶颈。</p>
+
+  <h3>2.3 内存带宽（CPU 侧）</h3>
+  <table>
+    <tr><th>模式</th><th>实测</th></tr>
+    <tr><td>只读</td><td class="mono">31.6 GB/s</td></tr>
+    <tr><td>只写</td><td class="mono">51.1 GB/s</td></tr>
+    <tr><td>拷贝（读+写）</td><td class="mono">45.9 GB/s</td></tr>
+    <tr><td>Triad（2 读 1 写）</td><td class="mono">46.4 GB/s</td></tr>
+  </table>
+  <div class="note">
+    <b>别被这个数字误导。</b>CPU 侧的单流 numpy 测试远达不到 273 GB/s 标称值——因为 GB10 的 20 个 Arm 核内存级并行度有限，而 <b>273 GB/s 是 GPU 与 CPU 共享总线的能力上限，主要靠 GPU 侧驱动</b>。<br>
+    真正的带宽证据在 2.1 节：推理反推出 GPU 侧有效带宽 <b>221 GB/s</b>。所以「统一内存带宽到底是满血还是残血」这个问题，<b>答案是满血（81% 达成率）</b>，CPU 侧那 46 GB/s 属于架构特性，不是你分到了差机器。
+  </div>
+
+  <h3>2.4 CPU 算力</h3>
+  <table>
+    <tr><th>项目</th><th>实测</th></tr>
+    <tr><td>单线程 · 整数循环 200 万次</td><td class="mono">0.094 s</td></tr>
+    <tr><td>单线程 · 浮点循环 200 万次</td><td class="mono">0.086 s</td></tr>
+    <tr><td>20 线程并发</td><td class="mono">0.266 s</td></tr>
+    <tr><td>并行加速比</td><td class="mono">13.49×（理想 20×，线性度 67%）</td></tr>
+  </table>
+  <p>67% 的线性度看着不高，但这是<b>预期内的</b>——10 个 Cortex-X925 大核 + 10 个 Cortex-A725 小核是异构设计，小核单核性能本来就低，不可能线性。单核性能本身相当能打（X925 是 Arm 现役最强通用核之一）。</p>
+
+  <h3>2.5 网络</h3>
+  <table>
+    <tr><th>项目</th><th>实测</th><th>评价</th></tr>
+    <tr><td>延迟（223.5.5.5）</td><td class="mono">平均 6.5 ms，零丢包</td><td><span class="tag t-ok">优秀</span></td></tr>
+    <tr><td>阿里云 PyPI 下载</td><td class="mono">≈ 10 MB/s</td><td><span class="tag t-ok">够用</span></td></tr>
+    <tr><td>公网端口映射（8014 → 8888）</td><td class="mono">HTTP 200 · 95 ms</td><td><span class="tag t-ok">映射正常</span></td></tr>
+    <tr><td>Cloudflare 测速</td><td class="mono">60 s 超时，0 字节</td><td><span class="tag t-bad">不可达</span></td></tr>
+  </table>
+
+  <h3>2.6 端口映射端到端验证</h3>
+  <p>我在节点上起了个测试服务绑定 <code>0.0.0.0:8888</code>，然后<b>从我的电脑通过公网访问</b>，结果：</p>
+  <pre><code>节点侧: LISTEN 0.0.0.0:8888   users:(("python3",pid=3426390))
+本机侧: curl http://CHANGE_ME_NODE_HOST:8014/
+        → HTTP 200  耗时 0.095s  下行 1512 bytes
+        → &lt;title&gt;Directory listing for /&lt;/title&gt;</code></pre>
+  <p><b>映射链路完全正常</b>，只要记住服务必须绑 <code>0.0.0.0</code> 而不是 <code>127.0.0.1</code>。（测试服务已清理，端口已释放。）</p>
+</section>
+
+<section>
+  <h2><span class="n">3</span>最大的坑：国际出网被彻底限制</h2>
+  <p>这是本次测评<b>最有价值</b>的发现，直接决定你的开发路径能不能走通：</p>
+  <table>
+    <tr><th>资源</th><th>状态</th><th>影响</th></tr>
+    <tr><td class="mono">mirrors.aliyun.com (PyPI)</td><td><span class="tag t-ok">HTTP 200 · 1.4 s</span></td><td>可用</td></tr>
+    <tr><td class="mono">mirror.nju.edu.cn (PyPI)</td><td><span class="tag t-ok">HTTP 200 · 2.1 s</span></td><td>可用</td></tr>
+    <tr><td class="mono">modelscope.cn</td><td><span class="tag t-ok">HTTP 302 · 0.2 s</span></td><td>可用（ollama 的模型就是从这拉的）</td></tr>
+    <tr><td class="mono">pypi.org</td><td><span class="tag t-bad">超时</span></td><td>pip 默认源不可用，必须换源</td></tr>
+    <tr><td class="mono">download.pytorch.org</td><td><span class="tag t-bad">超时</span></td><td><b>装不了官方 CUDA 版 PyTorch</b></td></tr>
+    <tr><td class="mono">nvcr.io（NVIDIA NGC）</td><td><span class="tag t-bad">超时</span></td><td><b>手册推荐的 NGC 容器方案行不通</b></td></tr>
+    <tr><td class="mono">registry-1.docker.io（Docker Hub）</td><td><span class="tag t-bad">超时</span></td><td><b>docker pull 任何镜像都会失败</b></td></tr>
+  </table>
+  <div class="note red">
+    <b>这条务必转给队友：</b>官方手册里写「优先用 NVIDIA 官方 NGC 容器省掉环境折腾」——在你这台机器上<b>做不到</b>，<code>nvcr.io</code> 完全不通。别在这上面浪费半天。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>得分卡</h2>
+  <div class="score">
+    <div class="lab">GPU / 显存</div><div class="bar"><i style="width:95%"></i></div><div class="num">9.5</div>
+    <div class="lab">内存容量</div><div class="bar"><i style="width:96%"></i></div><div class="num">9.6</div>
+    <div class="lab">内存带宽达成率</div><div class="bar"><i style="width:81%"></i></div><div class="num">8.1</div>
+    <div class="lab">磁盘 IO</div><div class="bar"><i style="width:92%"></i></div><div class="num">9.2</div>
+    <div class="lab">CPU 单核</div><div class="bar"><i style="width:85%"></i></div><div class="num">8.5</div>
+    <div class="lab">CPU 多核扩展</div><div class="bar warn"><i style="width:67%"></i></div><div class="num">6.7</div>
+    <div class="lab">国内网络</div><div class="bar"><i style="width:88%"></i></div><div class="num">8.8</div>
+    <div class="lab">国际网络 / 生态可用性</div><div class="bar bad"><i style="width:25%"></i></div><div class="num">2.5</div>
+  </div>
+  <div class="note green">
+    <b>综合结论：这是一台「算力过剩、生态受限」的机器。</b><br>
+    就「跑本地大模型 / 做 Agent 推理」这个黑客松场景而言，硬件层面完全够用甚至富余——128 GB 统一内存能让它跑 30B 级模型而不爆显存，这是同价位消费级显卡做不到的。<br>
+    真正的约束不在算力，<b>在于你必须把所有依赖都走国内源</b>。谁的工程流程先适配好国内镜像，谁就少踩坑。
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">5</span>上手建议（照着做能省一天）</h2>
+
+  <h3>5.1 pip 必须换源，否则装什么都是超时</h3>
+  <pre><code># 永久配置国内源
+pip3 config set global.index-url https://mirrors.aliyun.com/pypi/simple/
+pip3 config set global.trusted-host mirrors.aliyun.com
+
+# Ubuntu 24.04 的 Python 受管控，装包需要加参数
+pip3 install --break-system-packages numpy
+# 或更规范：建虚拟环境
+python3 -m venv ~/venv && source ~/venv/bin/activate</code></pre>
+
+  <h3>5.2 想要 GPU 版 PyTorch？官方源不通，走这两条路</h3>
+  <ul>
+    <li><b>路线 A（推荐，最省事）：直接用 ollama。</b>模型库预置、GPU 加速开箱即用、模型从 modelscope 拉。做 Agent Skills 类型的项目完全够。</li>
+    <li><b>路线 B：从 ModelScope 找 aarch64 + CUDA 的 torch wheel</b>（<code>modelscope.cn</code> 可达，社区有上传 GB10/aarch64 预编译轮子），或用 <code>pip download</code> 在别处下好再传进来。</li>
+    <li><b>路线 C：Docker 走国内镜像加速器</b>（阿里云容器镜像服务等），但 NGC 镜像拉不到，只能用 Docker Hub 的第三方镜像。</li>
+  </ul>
+
+  <h3>5.3 其他注意事项</h3>
+  <ul>
+    <li><b>时区是 UTC</b>，写日志、算时间差、设定时任务时会差 8 小时，记得 <code>export TZ=Asia/Shanghai</code> 或自己换算。</li>
+    <li><b>服务必须绑 <code>0.0.0.0</code></b>（已实测验证），绑 <code>127.0.0.1</code> 公网访问会 502。</li>
+    <li><b>8888 / 9000 是真正的公网端口</b>，我已经实测从外网能直接打开。Jupyter、Gradio 一定要加 token/password，用完就关，别挂裸奔的 Web 终端。</li>
+    <li><b>磁盘是 1 TB 不是 4 TB</b>，目前用了 101 G、剩 769 G。大模型权重一个就 20~40 G，注意别把盘塞满。</li>
+    <li><b>别用 scp 传大文件</b>，50 台机器共用一条公网出口，超 1 GB 请在节点上直接下载。</li>
+  </ul>
+
+  <h3>5.4 当前节点状态（我操作完已还原）</h3>
+  <table>
+    <tr><th>项目</th><th>状态</th></tr>
+    <tr><td>GPU</td><td class="mono">GB10 · 33 °C · 4.03 W · 利用率 0%</td></tr>
+    <tr><td>内存</td><td class="mono">已用 2.6 GiB / 可用 119 GiB</td></tr>
+    <tr><td>测试服务</td><td class="mono">已清理，8888/9000 端口已释放</td></tr>
+    <tr><td>ollama 模型</td><td class="mono">已卸载（ollama ps 为空，权重仍在硬盘上）</td></tr>
+    <tr><td>新增文件</td><td class="mono">~/spark_bench.sh、~/ollama_bench.sh、~/extra_bench.sh（我的测评脚本，可删）</td></tr>
+    <tr><td>新增软件</td><td class="mono">numpy 2.5.3（装在 ~/.local，用户级，不影响全局）</td></tr>
+  </table>
+</section>
+
+<footer>
+  报告由 WorkBuddy 生成 · 全部数据来自真机实测，无推测值<br>
+  测评脚本：spark_bench.sh（九项硬测） · ollama_bench.sh（推理实测） · extra_bench.sh（带宽/多核/端口）
+</footer>
+
+</div>
+</body>
+</html>

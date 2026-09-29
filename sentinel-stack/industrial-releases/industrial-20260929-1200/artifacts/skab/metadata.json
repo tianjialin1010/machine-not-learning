@@ -1,0 +1,279 @@
+{
+  "schema_version": 1,
+  "scenario": "skab",
+  "model_version": "skab-mlp64x32-20260929T035632Z",
+  "created_at": "2026-09-29T03:56:32.340507+00:00",
+  "model_architecture": {
+    "hidden": [
+      64,
+      32
+    ],
+    "activation": "ReLU",
+    "input_dim": 8,
+    "output_dim": 2
+  },
+  "raw_feature_names": [
+    "Accelerometer1RMS",
+    "Accelerometer2RMS",
+    "Current",
+    "Pressure",
+    "Temperature",
+    "Thermocouple",
+    "Voltage",
+    "Volume Flow RateRMS"
+  ],
+  "feature_units": {
+    "Accelerometer1RMS": "g",
+    "Accelerometer2RMS": "g",
+    "Current": "A",
+    "Pressure": "bar",
+    "Temperature": "°C",
+    "Thermocouple": "°C",
+    "Voltage": "V"
+  },
+  "classes": [
+    "normal",
+    "fault"
+  ],
+  "normal_class": "normal",
+  "temperature": 0.8608916593317348,
+  "calibrated": true,
+  "calibration": {
+    "method": "scalar_temperature_grid",
+    "fit_partition": "calibration",
+    "n": 7925,
+    "nll_before": 0.4212302293982114,
+    "nll_after": 0.4190603933292304,
+    "search_bounds": [
+      0.05,
+      20
+    ]
+  },
+  "imputer_medians": [
+    0.0280645,
+    0.0418961,
+    1.26486,
+    0.054711,
+    73.1274,
+    25.0766,
+    229.979,
+    32.9781
+  ],
+  "selected_feature_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "scaler_mean": [
+    0.11138284853433277,
+    0.14011494282782314,
+    1.5327284748137242,
+    0.0714782471333601,
+    77.34702685495024,
+    26.35631311738723,
+    229.57733257484495,
+    66.81184388288047
+  ],
+  "scaler_scale": [
+    0.11623718270614058,
+    0.13136230220724737,
+    0.765021600158166,
+    0.2604978532079702,
+    8.402542097597346,
+    2.7929011303819644,
+    11.007852370624157,
+    43.85258184216431
+  ],
+  "dataset": {
+    "name": "SKAB",
+    "source": "local dataset files from ind_ds",
+    "split": {
+      "strategy": "whole_file_group_split_60_20_20",
+      "groups": {
+        "train": [
+          "other/10.csv",
+          "other/11.csv",
+          "other/12.csv",
+          "other/13.csv",
+          "other/14.csv",
+          "other/3.csv",
+          "other/4.csv",
+          "other/8.csv",
+          "other/9.csv",
+          "valve1/0.csv",
+          "valve1/10.csv",
+          "valve1/11.csv",
+          "valve1/14.csv",
+          "valve1/15.csv",
+          "valve1/2.csv",
+          "valve1/3.csv",
+          "valve1/6.csv",
+          "valve1/7.csv",
+          "valve1/8.csv",
+          "valve2/1.csv"
+        ],
+        "calibration": [
+          "other/6.csv",
+          "other/7.csv",
+          "valve1/12.csv",
+          "valve1/13.csv",
+          "valve1/5.csv",
+          "valve2/0.csv",
+          "valve2/2.csv"
+        ],
+        "test": [
+          "other/1.csv",
+          "other/2.csv",
+          "other/5.csv",
+          "valve1/1.csv",
+          "valve1/4.csv",
+          "valve1/9.csv",
+          "valve2/3.csv"
+        ]
+      },
+      "limitation": "Held-out experiment files, single SKAB testbed; no claim of cross-factory validation.",
+      "counts": {
+        "train": 22413,
+        "calibration": 7925,
+        "test": 7063
+      },
+      "class_support": {
+        "train": {
+          "normal": 14615,
+          "fault": 7798
+        },
+        "calibration": {
+          "normal": 5186,
+          "fault": 2739
+        },
+        "test": {
+          "normal": 4533,
+          "fault": 2530
+        }
+      },
+      "row_id_sha256": {
+        "train": "6508f075b717b25d5e9cd912f1e3fbab8b051fc5a2ebed4e76af000a56e670ec",
+        "calibration": "37dd06b593fae3cee9d5e869f835b44f4904b658329f0dab148f5a0e37714db1",
+        "test": "906ed2395d619c746a94eac438992ea0ac50083fbc71245e753d66b20976a60e"
+      }
+    },
+    "source_sha256": {
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/other/1.csv": "3beaf861bdfe9b4f4eff8e7567c1dd3f506fbd0ce667fc9399d04bd2dc70623d",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/other/10.csv": "72683644f6f17689f619076a66a9ec02cbc0502bd669924c4c33951d1bdad9b0",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/other/11.csv": "98a2fff3b6516205ae2e12f2dd30d7f08465fe4321a1bd5cf823396985ecb37b",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/other/12.csv": "b0882efbcf2669223ae78bee61c9f10074a9b2375f0e86b8957ae5ce4aad1e72",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/other/13.csv": "b3f1da02064d11234836a9fa1a2536bb0d3b6c6998ab60b0b71869b98e94d860",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/other/14.csv": "c7f361e55397cc9efd4a76b6876111eda79b650d10aeb007342ca5972152eaef",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/other/2.csv": "951c326bf36366fa7615b8f28d22f80b3878036069a690f42b3e223737a6a8d1",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/other/3.csv": "f3c19a89f74f62a475c246b9263f161f7a734dd88304de803939cebaa55c7ebd",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/other/4.csv": "56ca23f4eb61d1347d079eb9a35c60a59b8b64e160c00dd0c2ec69e0df0b2a4b",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/other/5.csv": "7347b326df3a92c0810c69add0e5621939af7a1c1cb4755081d088e72d36920f",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/other/6.csv": "eb8f05622a62c855040ea358b87be35fb1a4a3720ba0610569bab384db4b6e04",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/other/7.csv": "1bee14f49bfc817ba2c335fb427baa71153d8f8ab52e72652f15f74e4b77daec",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/other/8.csv": "12c138ed99c198e0a7ece886fe01bfd16bbdde206fad6c5d74322b6b9d6488d0",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/other/9.csv": "11c4514b0bc706acff637fea6707ad9258ac878fe9dff3d0b11d2b618d94d8ea",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve1/0.csv": "16af3f71313a23dd33d9b7b8065d836d05c3f9257588881cc7fbe07c076d9dc8",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve1/1.csv": "fe4493bf805baef4e6dfb864094275d8cc2ea80a16b3735e2752b18b6aefd812",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve1/10.csv": "ee16be8e4b870c779491e3d1dc9e0ecbfaf29eb013e032abff7a33f2cbbfe2ad",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve1/11.csv": "89660fae4ed5c918db014409bbbc29f498fd99c7e956fab2620d18dea700a973",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve1/12.csv": "90adfa9bc86d4556e6a4ce734436fd5685af79c189cd9828f8df75a7f468ce07",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve1/13.csv": "d6cb6a97437215d3066a87e1fcc5fa4e68017629c043c5315920e3cf1060841c",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve1/14.csv": "5f0bb9bc33c5e6c259263e32e25915c4d24c82b0a94554d48808626da05c1d71",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve1/15.csv": "75cc86ab25d7091eee024739fa06d048753480d5d7d1507077231cab4f1b7a7e",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve1/2.csv": "90492413469261886c8896c327241448df5da73fd7739cabfec8dd82de3c0ce4",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve1/3.csv": "cb6afea108eddfd8447307e405f86bbb764b8d8e9130d7849a46e1303e19b8b2",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve1/4.csv": "983aed9dc09991a57911091373c580e1b86d06aa983cd51678f108fd8d709654",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve1/5.csv": "78974991ec87b7f9b9b6b2944f4b525468a9beb36c59b06cd7650d9a15eca14a",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve1/6.csv": "97469c0e0c9c0e0ee5d30794f1f36c6785df5816a112a8b16c59637e8c894685",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve1/7.csv": "ca2c9c6d6fa302c642acec6fbedac495bd12fececeee0a755d45a54e340e0f30",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve1/8.csv": "0c4afb92248b5b35b4c9d734a91ed8318346901f04579074903730569e60416c",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve1/9.csv": "2aa1ae1b2ff505caecda24802b877dc686924bbbeeb7e7db4faa261efb5ed5bd",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve2/0.csv": "a6670e7a68c7c6ba62c649bd9d350633e80db624578e9529f2b736ced5e32bde",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve2/1.csv": "b35d27f664eb0851ab73e5eb06633404c7eeaf532edff7e40c68eb9379f2012b",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve2/2.csv": "2c3005cf28b88db715b7f4694e826ff252cba4dbb1eba679b040961f80477e60",
+      "/home/USER/jev-service/ind_ds/x_skab/SKAB-master/data/valve2/3.csv": "86927555d5c523e587d41500bd5dee4e2468289ec1b988ac17755aeae697d7f8"
+    }
+  },
+  "training": {
+    "seed": 20260929,
+    "epochs": 300,
+    "optimizer": "Adam",
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "class_weights": [
+      0.7667807047553883,
+      1.4370992562195435
+    ],
+    "device": "cuda",
+    "preprocessing_fit_partition": "train",
+    "early_stopping": false,
+    "elapsed_seconds": 1.493
+  },
+  "metrics": {
+    "n": 7063,
+    "accuracy": 0.703525414129973,
+    "balanced_accuracy": 0.7292063732888985,
+    "macro_f1": 0.6994646907554607,
+    "top_label_ece": 0.12336172980398975,
+    "multiclass_brier": 0.4436902389280325,
+    "confusion_matrix": [
+      [
+        2895,
+        1638
+      ],
+      [
+        456,
+        2074
+      ]
+    ],
+    "class_support": {
+      "normal": 4533,
+      "fault": 2530
+    },
+    "noul": {
+      "balanced_accuracy": 0.7292063732888985,
+      "recall": 0.8197628458498024,
+      "false_positive_rate": 0.3613500992720053,
+      "brier": 0.22184511946401625,
+      "positive_support": 2530,
+      "negative_support": 4533
+    }
+  },
+  "display_features": [
+    {
+      "key": "Accelerometer1RMS",
+      "label": "Accelerometer1RMS",
+      "unit": "g",
+      "kind": "physical"
+    },
+    {
+      "key": "Current",
+      "label": "Current",
+      "unit": "A",
+      "kind": "physical"
+    },
+    {
+      "key": "Pressure",
+      "label": "Pressure",
+      "unit": "bar",
+      "kind": "physical"
+    },
+    {
+      "key": "Temperature",
+      "label": "Temperature",
+      "unit": "°C",
+      "kind": "physical"
+    }
+  ],
+  "limitations": [
+    "Research dataset inference; not connected to physical sensors.",
+    "Calibration fitted on a reserved partition; this is not production safety validation.",
+    "Held-out experiment files, single SKAB testbed; no claim of cross-factory validation."
+  ],
+  "model_sha256": "a6f21479fac91d27052ca2750c8fdbf327508a069c41bf2d99b08c915a508a05"
+}

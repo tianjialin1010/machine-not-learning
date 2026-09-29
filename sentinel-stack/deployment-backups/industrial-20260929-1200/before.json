@@ -1,0 +1,97 @@
+{
+  "health": {
+    "ok": true,
+    "provider": "tiered",
+    "degraded": false,
+    "framework": "jev-decision-service 0.1.5",
+    "decision_head": "sentinel-mlp@cuda",
+    "torch": "2.14.0+cu130",
+    "device": "cuda",
+    "data_path": "/home/USER/sentinel-stack/data/ai4i2020.csv",
+    "temperatures": {
+      "noul": 0.916,
+      "type": 0.9393,
+      "sev": 0.3196
+    },
+    "class_support": {
+      "No Failure": 9652,
+      "TWF": 46,
+      "HDF": 115,
+      "PWF": 91,
+      "OSF": 78,
+      "RNF": 18
+    },
+    "train_seconds": 0.17,
+    "cache_hit": true,
+    "escalate": false,
+    "escalate_floor": 0.8,
+    "generative_tier": null,
+    "generative_endpoint": null,
+    "generative_max_tokens": null,
+    "question_roles": {
+      "risk": "intervention_risk",
+      "action": "next_action",
+      "evidence": "needs_evidence",
+      "clarification": "needs_clarification",
+      "side_effect": "allows_side_effect"
+    },
+    "feature_contract": {
+      "names": [
+        "air_temp_c",
+        "process_temp_c",
+        "rpm",
+        "torque_nm",
+        "tool_wear_min"
+      ],
+      "units": {
+        "air_temp_c": "C",
+        "process_temp_c": "C",
+        "rpm": "rpm",
+        "torque_nm": "Nm",
+        "tool_wear_min": "min"
+      },
+      "bounds": {
+        "air_temp_c": [
+          -20.0,
+          80.0
+        ],
+        "process_temp_c": [
+          -20.0,
+          200.0
+        ],
+        "rpm": [
+          0.0,
+          4000.0
+        ],
+        "torque_nm": [
+          0.0,
+          200.0
+        ],
+        "tool_wear_min": [
+          0.0,
+          300.0
+        ]
+      }
+    },
+    "policy": {
+      "auto_confidence": 0.8,
+      "urgent_score": 2.5,
+      "next_action_threshold": 0.7
+    }
+  },
+  "protected": {
+    "sentinel_heads.py": "3b93d7d75bd73439ad483479b558895d0e00b9d970ae4ecb5d1d0fe28489ed6e",
+    "heads.pt": "b9c7c81ae74d708273d7361faa7f5eb35a5d643612669877d14c5b95293e2070",
+    "heads_meta.json": "47ccf5bb1c6921ad15ca8f1f10a86b4806595193ffa0e79a548c16168d04ff7b",
+    "dashboard.html": "ef66640d7e8e44326c5523189b7441e95da5f474fe99d2d1b88a494255c23c2a",
+    "data/ai4i2020.csv": "dc6630cd9b1f0f853922fad78a1b6436570d3f1ec863f1dd5c4340ac56bc8a8e"
+  },
+  "frontend": "/home/USER/sentinel-stack/frontend-releases/pc-ui-20260929-1115",
+  "command": [
+    "python3",
+    "-u",
+    "sentinel_integrated.py",
+    "--port",
+    "9000"
+  ]
+}

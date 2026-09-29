@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>哨兵 EdgeSentinel · 工业报警决策看板</title>
+<style>
+  :root{
+    --ink:#1F2328; --ink2:#4B5563; --line:#E5E7EB; --soft:#F7F8FA;
+    --nv:#76B900; --nv-d:#4F7A00;
+    --green:#1B7F3B; --green-bg:#F0FDF4;
+    --amber:#8A5A00; --amber-bg:#FFFBEB;
+    --red:#B02020; --red-bg:#FEF2F2;
+    --blue:#1D4ED8; --blue-bg:#EFF6FF;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--soft);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    font-size:14px;line-height:1.6;}
+  header{background:#fff;border-bottom:3px solid var(--nv);padding:14px 22px;
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+  h1{margin:0;font-size:17px;}
+  .sub{color:var(--ink2);font-size:12px;}
+  .ctl{display:flex;gap:8px;align-items:center;}
+  button{font:inherit;font-size:13px;padding:6px 14px;border-radius:7px;cursor:pointer;
+    border:1px solid var(--line);background:#fff;color:var(--ink);}
+  button:hover{border-color:var(--nv-d);color:var(--nv-d);}
+  button.on{background:var(--nv);border-color:var(--nv);color:#fff;}
+  .wrap{max-width:1400px;margin:0 auto;padding:16px 20px 40px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  @media(max-width:1000px){.grid{grid-template-columns:1fr;}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  h2{font-size:14px;margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid var(--line);}
+  .kpi{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
+  .kbox{background:var(--soft);border-radius:9px;padding:10px 12px;}
+  .kbox .v{font-size:20px;font-weight:600;color:var(--nv-d);
+    font-family:ui-monospace,Menlo,monospace;}
+  .kbox .l{font-size:11px;color:var(--ink2);}
+  .row{padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:7px;
+    background:#fff;font-size:12.5px;}
+  .row.s-new{border-left:3px solid var(--nv);}
+  .row.s-auto{border-left:3px solid var(--green);background:var(--green-bg);}
+  .row.s-review{border-left:3px solid var(--amber);background:var(--amber-bg);}
+  .row.s-escalate{border-left:3px solid var(--red);background:var(--red-bg);}
+  .tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:600;}
+  .t-ok{background:var(--green-bg);color:var(--green);}
+  .t-warn{background:var(--amber-bg);color:var(--amber);}
+  .t-bad{background:var(--red-bg);color:var(--red);}
+  .t-info{background:var(--blue-bg);color:var(--blue);}
+  .bar{height:7px;background:var(--line);border-radius:4px;overflow:hidden;margin:4px 0;}
+  .bar i{display:block;height:100%;background:var(--nv);}
+  .bar.r i{background:var(--red);}
+  .kv{display:flex;justify-content:space-between;font-size:12px;padding:2px 0;}
+  .kv b{font-family:ui-monospace,Menlo,monospace;}
+  .mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--ink2);}
+  .empty{color:var(--ink2);font-size:12.5px;padding:14px 0;text-align:center;}
+  table{width:100%;border-collapse:collapse;font-size:12px;}
+  th,td{padding:5px 7px;text-align:left;border-bottom:1px solid var(--line);}
+  th{background:var(--soft);color:var(--ink2);font-weight:600;}
+  td.n,th.n{text-align:right;font-family:ui-monospace,Menlo,monospace;}
+  .note{margin-top:14px;background:var(--amber-bg);border-left:4px solid #E0A040;
+    border-radius:8px;padding:10px 14px;font-size:12px;color:var(--ink2);}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>哨兵 EdgeSentinel · 工业报警决策看板</h1>
+    <div class="sub">System One 校准决策层 · NVIDIA DGX Spark GB10 · <span id="prov">—</span></div>
+  </div>
+  <div class="ctl">
+    <button id="btnRun" class="on">暂停</button>
+    <button id="btnSpeed">速度 ×1</button>
+    <button id="btnClear">清空</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="kpi">
+    <div class="kbox"><div class="v" id="kTotal">0</div><div class="l">已处理报警</div></div>
+    <div class="kbox"><div class="v" id="kAuto">—</div><div class="l">自动处置率</div></div>
+    <div class="kbox"><div class="v" id="kLat">—</div><div class="l">决策层延迟（每条）</div></div>
+    <div class="kbox"><div class="v" id="kQueue">0</div><div class="l">待人工复核</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>实时报警流</h2>
+      <div id="stream"><div class="empty">等待报警…</div></div>
+    </div>
+
+    <div class="card">
+      <h2>最新报警的三个决策</h2>
+      <div id="latest"><div class="empty">等待报警…</div></div>
+    </div>
+
+    <div class="card">
+      <h2>人工复核队列</h2>
+      <div id="queue"><div class="empty">队列为空</div></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px;">
+    <h2>路由统计</h2>
+    <table>
+      <tr><th>动作</th><th class="n">数量</th><th class="n">占比</th><th>含义</th></tr>
+      <tr><td><span class="tag t-ok">auto_close</span></td><td class="n" id="cClose">0</td>
+          <td class="n" id="pClose">—</td><td>判定为正常，仅记录</td></tr>
+      <tr><td><span class="tag t-info">auto_dispatch</span></td><td class="n" id="cAuto">0</td>
+          <td class="n" id="pAuto">—</td><td>高置信，自动派工单</td></tr>
+      <tr><td><span class="tag t-warn">human_review</span></td><td class="n" id="cReview">0</td>
+          <td class="n" id="pReview">—</td><td>中置信 / 严重度「立即」，转人工</td></tr>
+    </table>
+    <div class="note">
+      演示说明：报警数据由页面内的<b>传感器仿真器</b>生成（约 12% 注入真实故障特征），
+      每条都实时送进节点的校准决策层。概率经<b>温度缩放校准</b>，
+      因此「自动 / 复核」的阈值<b>才是有意义的</b>——未校准的概率做不到这件事。
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let running = true, speed = 1, seq = 0;
+let stats = {auto_close:0, auto_dispatch:0, human_review:0, total:0};
+let latSum = 0;
+const queue = [];
+
+function rnd(a,b){ return a + Math.random()*(b-a); }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+// 传感器仿真器：约 12% 概率生成带有真实故障特征的样本
+function makeEvent(){
+  seq++;
+  const bad = Math.random() < 0.12;
+  let air = rnd(21.5, 25.5);
+  let wear, diff, rpm, torque;
+  if (bad){
+    const kind = pick(["TWF","HDF","PWF","OSF","RNF"]);
+    if (kind === "TWF"){ wear = rnd(190,255); diff = rnd(10,14); torque = rnd(48,68); rpm = rnd(1250,1550); }
+    else if (kind === "HDF"){ wear = rnd(60,160); diff = rnd(12.5,16); torque = rnd(35,55); rpm = rnd(1150,1400); }
+    else if (kind === "PWF"){ wear = rnd(80,200); diff = rnd(9,13); torque = rnd(20,32); rpm = rnd(1400,1800); }
+    else if (kind === "OSF"){ wear = rnd(120,220); diff = rnd(10,14); torque = rnd(60,78); rpm = rnd(1900,2400); }
+    else { wear = rnd(30,240); diff = rnd(8,12); torque = rnd(30,55); rpm = rnd(1400,1800); }
+  } else {
+    wear = rnd(0,110); diff = rnd(7.5,10.5); torque = rnd(28,48); rpm = rnd(1400,1900);
+  }
+  return {
+    device_id: "CMP-" + String(10 + Math.floor(Math.random()*40)).padStart(3,"0"),
+    air_temp_c: +air.toFixed(1),
+    process_temp_c: +(air + diff).toFixed(1),
+    rpm: Math.round(rpm),
+    torque_nm: +torque.toFixed(1),
+    tool_wear_min: Math.round(wear),
+  };
+}
+
+function bar(v, red){
+  return '<div class="bar' + (red ? ' r' : '') + '"><i style="width:' +
+         (Math.min(100, v*100)).toFixed(1) + '%"></i></div>';
+}
+
+function renderStream(ev, d, tag){
+  const el = document.createElement("div");
+  el.className = "row " + tag;
+  el.innerHTML = '<b>' + ev.device_id + '</b> ' +
+    '<span class="mono">磨损' + ev.tool_wear_min + 'min · 温升' +
+    (ev.process_temp_c - ev.air_temp_c).toFixed(1) + 'K · ' +
+    ev.rpm + 'rpm · ' + ev.torque_nm + 'Nm</span><br>' +
+    '<span class="tag ' + (tag==="s-auto" ? "t-ok" : tag==="s-escalate" ? "t-bad" : "t-warn") + '">' +
+    d.routing.action + '</span> ' +
+    '<span class="mono">' + d.latency_ms.toFixed(2) + ' ms</span>';
+  const box = $("stream");
+  if (box.querySelector(".empty")) box.innerHTML = "";
+  box.prepend(el);
+  while (box.children.length > 14) box.lastChild.remove();
+}
+
+function renderLatest(ev, d){
+  const noul = d.decisions.find(x => x.type === "noul");
+  const ch   = d.decisions.find(x => x.type === "choice");
+  const sc   = d.decisions.find(x => x.type === "score");
+  const topType = Object.entries(ch.probabilities)
+    .filter(([k]) => k !== "No Failure").sort((a,b) => b[1]-a[1])[0];
+  $("latest").innerHTML =
+    '<div class="kv"><span>设备</span><b>' + ev.device_id + '</b></div>' +
+    '<div class="kv"><span>是否真实故障</span><b>' +
+      (noul.value ? "是" : "否") + ' · p=' + noul.probability.toFixed(4) + '</b></div>' +
+    bar(noul.probability, noul.value) +
+    '<div class="kv"><span>故障类型</span><b>' + ch.value + '</b></div>' +
+    '<div class="kv"><span>最可能的故障类</span><b>' + topType[0] + ' · ' +
+      (topType[1]*100).toFixed(1) + '%</b></div>' +
+    bar(topType[1]*10, true) +
+    '<div class="kv"><span>维护优先级</span><b>' + sc.label + '（' + sc.value + '）</b></div>' +
+    '<div class="kv"><span>路由动作</span><b>' + d.routing.action + '</b></div>' +
+    '<div class="kv"><span>原因码</span><b>' + d.routing.reason_codes.join(", ") + '</b></div>' +
+    '<div class="kv"><span>决策层延迟</span><b>' + d.latency_ms.toFixed(3) + ' ms</b></div>';
+}
+
+function renderQueue(){
+  const box = $("queue");
+  if (!queue.length){ box.innerHTML = '<div class="empty">队列为空</div>'; }
+  else {
+    box.innerHTML = queue.slice(0,12).map(q =>
+      '<div class="row s-review"><b>' + q.device_id + '</b> ' +
+      '<span class="mono">p=' + q.p.toFixed(3) + ' · ' + q.sev + '</span><br>' +
+      '<span class="mono">' + q.why.join(" / ") + '</span></div>').join("");
+  }
+  $("kQueue").textContent = queue.length;
+}
+
+function renderStats(){
+  const t = stats.total || 1;
+  $("kTotal").textContent = stats.total;
+  $("cClose").textContent = stats.auto_close;
+  $("cAuto").textContent = stats.auto_dispatch;
+  $("cReview").textContent = stats.human_review;
+  $("pClose").textContent = (stats.auto_close/t*100).toFixed(1) + "%";
+  $("pAuto").textContent = (stats.auto_dispatch/t*100).toFixed(1) + "%";
+  $("pReview").textContent = (stats.human_review/t*100).toFixed(1) + "%";
+  const handled = stats.auto_close + stats.auto_dispatch;
+  $("kAuto").textContent = stats.total ? (handled/t*100).toFixed(1) + "%" : "—";
+}
+
+async function tick(){
+  if (!running) return;
+  const ev = makeEvent();
+  try{
+    const res = await fetch("/v1/decide", {
+      method: "POST", headers: {"content-type":"application/json"},
+      body: JSON.stringify(ev)});
+    const d = await res.json();
+    $("prov").textContent = d.provider + " · torch " + (d.model ? "" : "");
+    stats.total++;
+    stats[d.routing.action] = (stats[d.routing.action] || 0) + 1;
+    latSum += d.latency_ms;
+    $("kLat").textContent = (latSum/stats.total).toFixed(3) + " ms";
+    const tag = d.routing.action === "auto_close" ? "s-new"
+              : d.routing.action === "auto_dispatch" ? "s-auto"
+              : d.routing.action === "human_review" ? "s-review" : "s-new";
+    renderStream(ev, d, tag);
+    renderLatest(ev, d);
+    if (d.routing.action === "human_review"){
+      const sc = d.decisions.find(x => x.type === "score");
+      queue.unshift({device_id: ev.device_id,
+                     p: d.decisions.find(x=>x.type==="noul").probability,
+                     sev: sc.label, why: d.routing.reason_codes});
+      if (queue.length > 60) queue.pop();
+      renderQueue();
+    }
+    renderStats();
+  } catch(e){
+    $("stream").innerHTML = '<div class="empty">请求失败：' + e + '</div>';
+  }
+  setTimeout(tick, 1200 / speed);
+}
+
+$("btnRun").onclick = () => {
+  running = !running;
+  $("btnRun").textContent = running ? "暂停" : "继续";
+  $("btnRun").className = running ? "on" : "";
+  if (running) tick();
+};
+$("btnSpeed").onclick = () => {
+  speed = speed === 1 ? 3 : speed === 3 ? 8 : 1;
+  $("btnSpeed").textContent = "速度 ×" + speed;
+};
+$("btnClear").onclick = () => {
+  stats = {auto_close:0, auto_dispatch:0, human_review:0, total:0};
+  latSum = 0; queue.length = 0;
+  $("stream").innerHTML = '<div class="empty">等待报警…</div>';
+  $("latest").innerHTML = '<div class="empty">等待报警…</div>';
+  renderQueue(); renderStats();
+};
+
+fetch("/healthz").then(r => r.json()).then(d => {
+  $("prov").textContent = d.provider + " · torch " + d.torch;
+}).catch(() => {});
+tick();
+</script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+
+[1;36m══ 0. 基础环境 ══[0m
+
+$ date; hostname; whoami
+Sun Sep 20 06:54:31 AM UTC 2026
+gx10-902c
+USER
+
+$ uname -a
+Linux gx10-902c 6.17.0-1014-nvidia #14-Ubuntu SMP PREEMPT_DYNAMIC Tue Mar 17 19:01:40 UTC 2026 aarch64 aarch64 aarch64 GNU/Linux
+
+$ cat /etc/os-release | head -4
+PRETTY_NAME="Ubuntu 24.04.4 LTS"
+NAME="Ubuntu"
+VERSION_ID="24.04"
+VERSION="24.04.4 LTS (Noble Numbat)"
+
+$ uptime
+ 06:54:31 up 18 days, 22:45,  1 user,  load average: 0.03, 0.01, 0.00
+
+[1;36m══ 1. CPU ══[0m
+
+$ lscpu | sed -n '1,25p'
+Architecture:                            aarch64
+CPU op-mode(s):                          64-bit
+Byte Order:                              Little Endian
+CPU(s):                                  20
+On-line CPU(s) list:                     0-19
+Vendor ID:                               ARM
+Model name:                              Cortex-X925
+Model:                                   1
+Thread(s) per core:                      1
+Core(s) per socket:                      10
+Socket(s):                               1
+Stepping:                                r0p1
+Frequency boost:                         disabled
+CPU(s) scaling MHz:                      100%
+CPU max MHz:                             3900.0000
+CPU min MHz:                             1378.0000
+BogoMIPS:                                2000.00
+Flags:                                   fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 sve asimdfhm dit uscat ilrcpc flagm sb paca pacg dcpodp sve2 sveaes svepmull svebitperm svesha3 svesm4 flagm2 frint svei8mm svebf16 i8mm bf16 dgh bti ecv afp wfxt
+Model name:                              Cortex-A725
+Model:                                   1
+Thread(s) per core:                      1
+Core(s) per socket:                      10
+Socket(s):                               1
+Stepping:                                r0p1
+CPU(s) scaling MHz:                      100%
+
+$ nproc
+20
+
+--- 短时 CPU 满载（10 秒，观察频率与降频） ---
+
+$ echo 'sysbench 未安装，使用 Python 多进程基准替代'
+sysbench 未安装，使用 Python 多进程基准替代
+
+$ /usr/bin/python3 - <<'PY'
+import time,multiprocessing as mp,os
+def work(n):
+    s=0.0
+    for i in range(n): s+=i**0.5
+    return s
+def bench():
+    t=time.time(); work(6_000_000); return time.time()-t
+if __name__=='__main__':
+    t=time.time(); bench(); one=time.time()-t
+    print('单线程耗时: %.2f s'%one)
+    n=os.cpu_count() or 4
+    with mp.Pool(n) as p:
+        t=time.time(); p.map(lambda _: bench(), range(n)); multi=time.time()-t
+    print('%d 线程耗时: %.2f s'%(n,multi))
+    print('并行加速比: %.2fx  (理想 %.1fx)'%(one*n/multi, n))
+PY
+单线程耗时: 0.25 s
+Traceback (most recent call last):
+  File "<stdin>", line 13, in <module>
+  File "/usr/lib/python3.12/multiprocessing/pool.py", line 367, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/pool.py", line 774, in get
+    raise self._value
+  File "/usr/lib/python3.12/multiprocessing/pool.py", line 540, in _handle_tasks
+    put(task)
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 206, in send
+    self._send_bytes(_ForkingPickler.dumps(obj))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/reduction.py", line 51, in dumps
+    cls(buf, protocol).dump(obj)
+_pickle.PicklingError: Can't pickle <function <lambda> at 0xfde6b0d9fc40>: attribute lookup <lambda> on __main__ failed
+
+[1;36m══ 2. 内存 ══[0m
+
+$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           121Gi       2.5Gi       114Gi       5.6Mi       6.1Gi       119Gi
+Swap:           15Gi        11Mi        15Gi
+
+$ lscpu | grep -iE 'L3|NUMA node\(s\)|CPU\(s\)|Thread|Core' | head -10
+CPU(s):                                  20
+On-line CPU(s) list:                     0-19
+Thread(s) per core:                      1
+Core(s) per socket:                      10
+CPU(s) scaling MHz:                      100%
+Thread(s) per core:                      1
+Core(s) per socket:                      10
+CPU(s) scaling MHz:                      100%
+L3 cache:                                24 MiB (2 instances)
+NUMA node(s):                            1
+
+$ cat /proc/meminfo | grep -E 'MemTotal|MemAvailable|SwapTotal'
+MemTotal:       127535828 kB
+MemAvailable:   124864784 kB
+SwapTotal:      16777212 kB
+
+--- 内存带宽实测（纯 Python 内存拷贝，参考值） ---
+
+$ /usr/bin/python3 - <<'PY'
+import time
+N=512*1024*1024          # 512 MiB
+try:
+    import numpy as np
+    a=np.ones(N//8,dtype=np.float64); b=np.empty_like(a)
+    for _ in range(2): b[:]=a          # warmup
+    t=time.time()
+    for _ in range(10): b[:]=a
+    dt=time.time()-t
+    gb=10*(N/1024**3)*2
+    print('numpy 拷贝带宽: %.1f GB/s (读+写)'%(gb/dt))
+except ImportError:
+    a=bytearray(N); b=bytearray(N)
+    t=time.time()
+    for _ in range(5): b[:]=a
+    dt=time.time()-t
+    gb=5*(N/1024**3)*2
+    print('bytearray 拷贝带宽: %.1f GB/s (读+写) [numpy 未安装，数值偏低属正常]'%(gb/dt))
+PY
+bytearray 拷贝带宽: 45.1 GB/s (读+写) [numpy 未安装，数值偏低属正常]
+
+[1;36m══ 3. GPU ══[0m
+
+$ nvidia-smi
+Sun Sep 20 06:54:32 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.142                Driver Version: 580.142        CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GB10                    On  |   0000000F:01:00.0 Off |                  N/A |
+| N/A   35C    P8              4W /  N/A  | Not Supported          |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+
+$ nvidia-smi -q | grep -E 'Product Name|CUDA Version|Driver Version|Total *:|Memory Bus|Max Power|Compute Cap' | head -20
+Driver Version                                         : 580.142
+CUDA Version                                           : 13.0
+    Product Name                                       : NVIDIA GB10
+        Total                                          : N/A
+        Total                                          : N/A
+        Total                                          : 0 MiB
+        Max Power Limit                                : N/A
+        Max Power Limit                                : N/A
+
+$ nvidia-smi topo -m 2>/dev/null || echo '(topo 不可用)'
+	[4mGPU0	CPU Affinity	NUMA Affinity	GPU NUMA ID[0m
+GPU0	 X 	0-19	0		N/A
+
+Legend:
+
+  X    = Self
+  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)
+  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node
+  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)
+  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)
+  PIX  = Connection traversing at most a single PCIe bridge
+  NV#  = Connection traversing a bonded set of # NVLinks
+
+[1;36m══ 4. 磁盘 IO ══[0m
+
+$ df -hT | grep -vE 'tmpfs|overlay'
+Filesystem     Type      Size  Used Avail Use% Mounted on
+efivarfs       efivarfs  256K   37K  220K  15% /sys/firmware/efi/efivars
+/dev/nvme0n1p2 ext4      916G  101G  769G  12% /
+/dev/nvme0n1p1 vfat      511M  6.4M  505M   2% /boot/efi
+
+--- 顺序写 / 顺序读（1 GiB） ---
+
+$ cd /home/USER/spark_bench_20260920_065431 && dd if=/dev/zero of=iotest.bin bs=1M count=1024 oflag=direct 2>&1 | tail -1
+1073741824 bytes (1.1 GB, 1.0 GiB) copied, 0.232833 s, 4.6 GB/s
+
+$ sync; sudo -n sh -c 'echo 3 > /proc/sys/vm/drop_caches' 2>/dev/null; dd if=/home/USER/spark_bench_20260920_065431/iotest.bin of=/dev/null bs=1M iflag=direct 2>&1 | tail -1
+1073741824 bytes (1.1 GB, 1.0 GiB) copied, 0.185857 s, 5.8 GB/s
+
+$ rm -f /home/USER/spark_bench_20260920_065431/iotest.bin
+
+[1;36m══ 5. 网络 ══[0m
+
+--- 节点出口测速（下载 100MB，注意 50 台共用一条公网出口） ---
+
+$ curl -sL --max-time 60 -o /dev/null -w '  目标: %{remote_ip}\n  下载: %{speed_download} B/s\n  耗时: %{time_total} s\n' 'https://speed.cloudflare.com/__down?bytes=104857600'
+  目标: 
+  下载: 0 B/s
+  耗时: 60.003194 s
+
+--- 延迟（国内公共 DNS） ---
+
+$ ping -c 5 -W 2 223.5.5.5 2>&1 | tail -3
+--- 223.5.5.5 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4008ms
+rtt min/avg/max/mdev = 6.258/6.501/6.824/0.239 ms
+
+[1;36m══ 6. AI 软件栈 ══[0m
+
+$ nvcc --version 2>/dev/null | tail -2 || echo 'nvcc: 未安装'
+nvcc: 未安装
+
+$ python3 -c 'import torch;print("PyTorch",torch.__version__,"| CUDA",torch.version.cuda,"| 设备",torch.cuda.get_device_name(0),"| capability",torch.cuda.get_device_capability(0))' 2>&1 | tail -2
+  File "<string>", line 1, in <module>
+ModuleNotFoundError: No module named 'torch'
+
+$ docker --version 2>/dev/null || echo 'docker: 未安装'
+Docker version 29.2.1, build a5c7197
+
+$ which ollama vllm sglang 2>/dev/null || echo '(未发现 ollama/vllm/sglang)'
+/usr/local/bin/ollama
+(未发现 ollama/vllm/sglang)
+
+$ ollama list 2>/dev/null || true
+NAME                                             ID              SIZE     MODIFIED    
+modelscope.cn/unsloth/Qwen3.8-27B-GGUF:latest    95c9635e54b0    17 GB    11 days ago    
+
+$ ls ~/.cache/huggingface/hub 2>/dev/null || echo '(HuggingFace 缓存为空)'
+(HuggingFace 缓存为空)
+
+[1;36m══ 7. GPU 算力实测（PyTorch） ══[0m
+
+$ /usr/bin/python3 - <<'PY'
+try:
+    import torch, time
+except Exception as e:
+    print('PyTorch 不可用，跳过:', e); raise SystemExit
+if not torch.cuda.is_available():
+    print('CUDA 不可用'); raise SystemExit
+dev=torch.cuda.get_device_name(0)
+print('设备:', dev)
+props=torch.cuda.get_device_properties(0)
+print('显存: %.1f GB | SM 数: %d | 计算能力: %s'%(props.total_memory/1024**3, props.multi_processor_count, props.major+props.minor/10))
+torch.backends.cuda.matmul.allow_tf32=True
+
+def bench(dtype,n=8192,iters=20,tag=''):
+    try:
+        a=torch.randn(n,n,dtype=dtype,device='cuda'); b=torch.randn(n,n,dtype=dtype,device='cuda')
+    except Exception as e:
+        print('  %s 不支持: %s'%(tag,e)); return
+    for _ in range(5): c=a@b
+    torch.cuda.synchronize()
+    t=time.time()
+    for _ in range(iters): c=a@b
+    torch.cuda.synchronize()
+    dt=(time.time()-t)/iters
+    fl=2*n**3
+    print('  %-6s %dx%d 矩阵乘: %.1f ms/tile  →  %.1f TFLOPS'%(tag,n,n,dt*1000,fl/dt/1e12))
+
+print('矩阵乘法吞吐:')
+bench(torch.float32,tag='FP32')
+bench(torch.bfloat16,tag='BF16')
+try: bench(torch.float8_e4m3fn,tag='FP8')
+except Exception: pass
+
+print('显存带宽:')
+for dt,name in [(torch.float32,'FP32')]:
+    a=torch.empty(256*1024*1024//4,dtype=dt,device='cuda'); b=torch.empty_like(a)
+    for _ in range(3): b.copy_(a)
+    torch.cuda.synchronize()
+    t=time.time(); n=10
+    for _ in range(n): b.copy_(a)
+    torch.cuda.synchronize()
+    dtm=(time.time()-t)/n
+    print('  拷贝带宽: %.1f GB/s (读+写)  [%s]'%(2*a.numel()*4/dtm/1e9,name))
+PY
+PyTorch 不可用，跳过: No module named 'torch'
+
+[1;36m══ 8. LLM 推理实测 ══[0m
+
+$ ollama ps 2>/dev/null; ollama list 2>/dev/null | head -10
+NAME    ID    SIZE    PROCESSOR    CONTEXT    UNTIL 
+NAME                                             ID              SIZE     MODIFIED    
+modelscope.cn/unsloth/Qwen3.8-27B-GGUF:latest    95c9635e54b0    17 GB    11 days ago    
+
+--- 若已有模型，执行： ollama run <模型> --verbose  观察 tokens/s ---
+
+[1;36m══ 9. 汇总 ══[0m
+报告生成时间: 2026-09-20T06:55:37+00:00
+主机: gx10-902c  用户: USER
+内核: 6.17.0-1014-nvidia
+CPU: Cortex-X925  核心: 20
+内存: 121Gi  可用: 118Gi
+GPU : NVIDIA GB10, [N/A], 580.142
+磁盘: 916G 总 / 769G 可用
+
+[1;32m✅ 测评完成，报告: /home/USER/spark_bench_20260920_065431/report.txt[0m
+取回本地:  scp -P <端口> USER@<IP>:/home/USER/spark_bench_20260920_065431/report.txt ./   （注意 scp 的端口参数是大写 -P）
